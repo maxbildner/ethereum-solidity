@@ -1,8 +1,11 @@
 {\rtf1\ansi\ansicpg1252\cocoartf2578
-\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fswiss\fcharset0 Helvetica-Bold;}
-{\colortbl;\red255\green255\blue255;\red251\green0\blue7;\red25\green60\blue255;}
-{\*\expandedcolortbl;;\cssrgb\c100000\c12195\c0;\cssrgb\c12594\c35385\c100000;}
-\margl1440\margr1440\vieww12360\viewh10900\viewkind0
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fswiss\fcharset0 Helvetica-Bold;\f2\fswiss\fcharset0 Helvetica-Oblique;
+}
+{\colortbl;\red255\green255\blue255;\red251\green0\blue7;\red25\green60\blue255;\red25\green60\blue255;
+\red25\green61\blue255;\red251\green0\blue7;}
+{\*\expandedcolortbl;;\cssrgb\c100000\c12195\c0;\cssrgb\c12594\c35385\c100000;\cssrgb\c12594\c35385\c100000;
+\cssrgb\c13005\c35866\c100000;\cssrgb\c100000\c12195\c0;}
+\margl1440\margr1440\vieww13500\viewh18800\viewkind0
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
 \f0\fs28 \cf0 9/13/21\
@@ -81,6 +84,7 @@ https://github.com/StephenGrider/EthereumCasts\
 - 
 \f1\b \ul Hash
 \f0\b0 \ulnone  = output of hashing function. In SHA256, output is always same character length\
+	- hexadecimal encoded number (even though it looks like it has numbers/letters, its actually a number)\
 - 
 \f1\b \ul Hashing function
 \f0\b0 \ulnone  = \
@@ -98,6 +102,9 @@ https://github.com/StephenGrider/EthereumCasts\
 - 
 \f1\b \ul Mine
 \f0\b0 \ulnone  = guesses different nonce input values until function returns desired output (hash with zeros in front)\
+	- actually we\'92re comparing the 
+\f2\i output hash value
+\f0\i0  (converted into a base 10 number) to see if it\'92s less 	  than a certain number (ex. 1000). See Slide #2\
 - 
 \f1\b \ul Prev
 \f0\b0 \ulnone  = hash of previous block\
@@ -108,11 +115,161 @@ https://github.com/StephenGrider/EthereumCasts\
 \
 \
 16. Block Time\
+- 
+\f1\b \ul Proof of Work Algorithm (POW)
+\f0\b0 \ulnone  Analogy\
+	- it\'92s like trying to roll 64 dice such that the sum of those numbers are less than 100\
+	- might need to roll many times \
+- 
+\f1\b \ul Block Time
+\f0\b0 \ulnone  = Time to find a solution where the nonce results in an output number less than some \ul Target Number\ulnone \
+- Ethereum network ideally has a block time of 
+\f2\i \ul 15 seconds
+\f0\i0 \ulnone \
+- 
+\f1\b \ul Target Number
+\f0\b0 \ulnone \
+	- changes depending on how hard or easy it was to mine the previous block. See slide #1-3\
+- it takes different amounts of time because the number of nodes in the network constantly change\
+\
+\
+17. 
+\f1\b \ul Smart Contracts
+\f0\b0 \ulnone \
+- An account (like the one on Metamask) controlled by code \
+- Properties of smart contract account:\
+	1- \ul Balance\ulnone  = amount of ether this account owns\
+	2- \ul storage\ulnone  = data storage for this contract (anything relevant to our application)\
+	3- \ul code\ulnone  = raw machine / byte code for contract\
+- contract accounts are specific to only 1 ethereum network!!! (Unlike an external account from MetaMask)\
+- \ul Contract Source\ulnone  = Class in OOP\
+- \ul Contract Instance\ulnone  = Object Instance in OOP\
+- When we 
+\f1\b \ul Deploy
+\f0\b0 \ulnone  (create) a contract source, it becomes a 
+\f1\b \ul contract instance
+\f0\b0 \ulnone  on the specified network\
+\
+\
+18. 
+\f1\b \ul Solidity
+\f0\b0 \ulnone  Programming Language\
+- written in 
+\f2\i .sol
+\f0\i0  files\
+- 
+\f1\b \ul strongly typed
+\f0\b0 \ulnone  =\
+- syntax similar to JavaScript, but way it works is different\
+- has lots of huge \'93gotchas\'94\
+- the solidity file is 
+\f1\b \ul compiled
+\f0\b0 \ulnone  into 2 separate files:\
+	- 
+\f1\b \ul Byte Code =
+\f0\b0 \ulnone  for deployment to ethereum network\
+	- 
+\f1\b \ul Application Binary Interface (ABI)
+\f0\b0 \ulnone  = allows us to interact with byte code\
+- ABI\
+	- sort of a middleman between us and the byte code\
+	- we\'92ll write JavaScript Code to interact with the ABI (which interacts with the Byte Code)\
+\
+19. 
+\f1\b \ul Remix Browser Editor
+\f0\b0 \ulnone  for Writing Ethereum Contracts\
+\cf4 \ul \ulc5 https://remix.ethereum.org/\cf0 \ulnone \
+- made for creating and testing solidity contracts in the browser\
+- Like codepen, but for Solidity\
+- use compiler 0.4.17+commit.bdeb9e52 to match lecture videos\
+- click Ethereum Icon in left sidebar to Run\
+- Environment = choose JavaScript VM (in browser virtual network) NOT injected web3\
+- Deploy Button = same as Create Button in videos\
+\
+\
+20-25 See lesson1_20.sol file for notes on how to write your first solidity contract\
+\
+26. Behind the scenes of Contract Deployment\
+- creating (
+\f1\b \ul deploying
+\f0\b0 \ulnone ) a smart contract is similar to the transfer of money on the bitcoin network \
+- instead of a Transaction Object being created, a Contract Transaction object is created?\
+- the sender is the person creating the smart contract\
+- to field is left blank (in comparison to a Bitcoin Transaction Object) when a contract is deployed\
+- ? where is compiled bytecode for smart contract stored? (Once deployed)?\
+- 
+\f1\b \ul v, r, s
+\f0\b0 \ulnone  properties = can think about them as a unique identifier as who is trying to create this contract\
+- 
+\f1\b \ul value property
+\f0\b0 \ulnone  = contracted has some initial balance of ether. \
+	- amount of 
+\f1\b \ul Wei
+\f0\b0 \ulnone  to send to the target address\
+\
+\
+27. More on Running Functions\
+- 
+\f2\i anytime we want to update any data on the blockchain, we have to submit a transaction object
+\f0\i0 \
+	- we also have to wait for it to be mined (PoW)\
+- See lecture slide 1-11-27\
+- Ex. The setter method setMessage in our contract example will create a transaction object,\
+However calling the getMessage function will not!\
+- whenever we 
+\f1\b \ul send a transaction to a function
+\f0\b0 \ulnone , that returns the 
+\f1\b \ul transaction hash\
+
+\f0\b0 \ulnone - 
+\f2\i solidity functions that return values do NOT modify the contract\'92s data (ex. getMessage())
+\f0\i0 \
+	- only VIEW or CONSTANT (both same) function types\
+- note how when we send a transaction to a function (ex. By calling setMessage(\'91yo\'92)), the amount of ether in the account decreases by a little bit\
+- also note how since we\'92re using a test network, these transaction objects get verified instantly!!!\
+	- not the case when using the real main network, will take some time (15-30seconds)\
+\
+\
+28. 
+\f1\b \ul Wei
+\f0\b0 \ulnone  vs Ether\
+- They are both units of measurements of the same thing!\
+\cf6 - 1 Ether = 1,000,000,000,000,000,000 Wei\cf0  (18 zero\'92s = 10^18) \
+- no such thing as a fractional unit of Wei\
+- etherconverter.online\
+\
+\
+29. Gas and Transactions\
+- 
+\f1\b \cf6 \ul \ulc5 Gas
+\f0\b0 \cf0 \ulnone  =\
+	- meant to measure how much work we are executing with our code\
+	- Ex. Analogy- if you want to run some code on AWS, it costs money\
+	- in order to get someone else to run our smart contracts, we have to pay gas\
+	- cost of running our smart contract?\
+
+\f2\i 	- Ex. In order to add two numbers together in a smart contract function, we have to pay 3 gas
+\f0\i0 \
+	- whenever we issue a transaction that\'92s meant to modify the blockchain, we have to pay gas\
+		- we have to specify two properties in our transaction object:\
+		  1- \cf6 Gas Price \cf0 \
+			- amount of Wei the sender is willing to pay per unit gas to get this transaction processed\
+			- if I were to offer a gas price of 10, that means I would be willing to pay 10 * 3 (cost to add two numbers) to add two numbers together\
+		  2- 
+\f1\b \cf6 Start Gas / Gas Limit
+\f0\b0 \cf0  = total units of gas that this transaction can consume\
+\
+\
 \
 \
 \
 \
 QUESTIONS\
+- ? where is compiled bytecode for smart contract stored? (Once deployed)?\
+	- on Ethereum Blockchain?\
+- why 15 seconds for mining ether/approving transactions?\
+- seems super inefficient. If we were building twitter using the ethereum network, sending one tweet would take 15-30 seconds?!\
+- why is it called \'93Wei\'94?\
 \
 \
 \
