@@ -1,11 +1,11 @@
 {\rtf1\ansi\ansicpg1252\cocoartf2578
 \cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fswiss\fcharset0 Helvetica-Bold;\f2\fswiss\fcharset0 Helvetica-Oblique;
 }
-{\colortbl;\red255\green255\blue255;\red251\green0\blue7;\red25\green60\blue255;\red25\green60\blue255;
-\red25\green61\blue255;\red251\green0\blue7;}
-{\*\expandedcolortbl;;\cssrgb\c100000\c12195\c0;\cssrgb\c12594\c35385\c100000;\cssrgb\c12594\c35385\c100000;
-\cssrgb\c13005\c35866\c100000;\cssrgb\c100000\c12195\c0;}
-\margl1440\margr1440\vieww13500\viewh18800\viewkind0
+{\colortbl;\red255\green255\blue255;\red251\green0\blue7;\red251\green0\blue7;\red25\green60\blue255;
+\red25\green61\blue255;\red25\green60\blue255;\red26\green63\blue255;\red27\green64\blue255;}
+{\*\expandedcolortbl;;\cssrgb\c100000\c12195\c0;\cssrgb\c100000\c12195\c0;\cssrgb\c12594\c35385\c100000;
+\cssrgb\c13005\c35866\c100000;\cssrgb\c12594\c35385\c100000;\cssrgb\c13414\c36345\c100000;\cssrgb\c13821\c36821\c100000;}
+\margl1440\margr1440\vieww13500\viewh21060\viewkind0
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
 \f0\fs28 \cf0 9/13/21\
@@ -49,9 +49,9 @@ https://github.com/StephenGrider/EthereumCasts\
 9-11. Ethereum Accounts\
 - Metamask Account\
 - One Account can be used to interact with multiple different ethereum networks\
-	- Creates Account Address (like a unique email address)\
-	- Public Key\
-	- Private Key\
+	- Creates \cf3 Account Address\cf0  (like a unique email address)\
+	- \cf3 Public Key\cf0 \
+	- \cf3 Private Key\cf0 \
 \
 12. What\'92s a Transaction?\
 - a record attempting to send money to another account\
@@ -80,7 +80,7 @@ https://github.com/StephenGrider/EthereumCasts\
 \
 15. Blockchain Demo by Anders Brownworth\
 - generic blockchain\
-\cf3 \ul \ulc3 https://andersbrownworth.com/blockchain/blockchain\cf0 \ulnone \
+\cf4 \ul \ulc4 https://andersbrownworth.com/blockchain/blockchain\cf0 \ulnone \
 - 
 \f1\b \ul Hash
 \f0\b0 \ulnone  = output of hashing function. In SHA256, output is always same character length\
@@ -234,32 +234,55 @@ However calling the getMessage function will not!\
 \f1\b \ul Wei
 \f0\b0 \ulnone  vs Ether\
 - They are both units of measurements of the same thing!\
-\cf6 - 1 Ether = 1,000,000,000,000,000,000 Wei\cf0  (18 zero\'92s = 10^18) \
+\cf2 - 1 Ether = 1,000,000,000,000,000,000 Wei\cf0  (18 zero\'92s = 10^18) \
 - no such thing as a fractional unit of Wei\
 - etherconverter.online\
 \
 \
 29. Gas and Transactions\
 - 
-\f1\b \cf6 \ul \ulc5 Gas
+\f1\b \cf2 \ul Gas
 \f0\b0 \cf0 \ulnone  =\
 	- meant to measure how much work we are executing with our code\
 	- Ex. Analogy- if you want to run some code on AWS, it costs money\
 	- in order to get someone else to run our smart contracts, we have to pay gas\
-	- cost of running our smart contract?\
+	- 
+\f2\i \cf6 cost (in Wei)
+\f0\i0 \cf0  of running our smart contract?\
 
 \f2\i 	- Ex. In order to add two numbers together in a smart contract function, we have to pay 3 gas
 \f0\i0 \
 	- whenever we issue a transaction that\'92s meant to modify the blockchain, we have to pay gas\
 		- we have to specify two properties in our transaction object:\
-		  1- \cf6 Gas Price \cf0 \
-			- amount of Wei the sender is willing to pay per unit gas to get this transaction processed\
-			- if I were to offer a gas price of 10, that means I would be willing to pay 10 * 3 (cost to add two numbers) to add two numbers together\
+		  1-
+\f1\b  \cf2 Gas Price 
+\f0\b0 \cf0 \
+			- \cf6 amount of Wei the sender is willing to pay per unit gas\cf0  to get this transaction processed\
+			- if I were to offer a gas price of 10, that means I would be willing to pay 10 * 3 (cost to add two numbers) to add two numbers together = 300\
 		  2- 
-\f1\b \cf6 Start Gas / Gas Limit
+\f1\b \cf2 Start Gas / Gas Limit
 \f0\b0 \cf0  = total units of gas that this transaction can consume\
+- if gas limit is not enough to execute all code, execution of function immediately halts\
+- leftover gas gets sent back to us (if gasLimit is 20, and only 14 gas is used, 6 gas gets sent back)\
+- Ex. If gasPrice = 300, gasLimit = 20, and we consumed 14 Gas\
+\cf6 Total Cost = gasPrice * gasConsumed \cf0  = 300 * 14 = 4,200 wei\
+- Because it costs money to update data on the blockchain, this severely limits the types of applications you can build on with solidity. Imagine if twitter users had to pay money every time they tweeted!!! There are ways to deal with this however (discussed later)\
 \
 \
+30. Mnemonic Phrases\
+- if one has multiple ethereum accounts instead of remembering each one (because each one has an address, public key, and private key), people can remember a random 12 word mnemonic phrase!!\
+- Ex. Pave cattle recycle grit very erupt above team cousin scale mammal sock\
+- A \ul BIP39 mnemonic algorithm\ulnone  takes those 12 words and returns 3 accounts with addresses/private/public keys\
+- do they have to be in order?\
+- note* you can\'92t create a new mnemonics with metamask, you have uninstall then reinstall\
+\
+\
+31-32. How to Get more Test Ether\
+Go to:\
+- \cf6 faucet.rinkeby.io\cf0 \
+- to get test ether, \
+	- 1- make public tweet posting your account address (can delete tweet later)\
+	- 2- copy and paste tweet url at the faucet.rinkeyby.io text box\
 \
 \
 \
@@ -270,7 +293,7 @@ QUESTIONS\
 - why 15 seconds for mining ether/approving transactions?\
 - seems super inefficient. If we were building twitter using the ethereum network, sending one tweet would take 15-30 seconds?!\
 - why is it called \'93Wei\'94?\
-\
+- do pneumonic phrases they have to be in order?\
 \
 \
 \
