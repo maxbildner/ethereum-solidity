@@ -1,5 +1,5 @@
 {\rtf1\ansi\ansicpg1252\cocoartf2578
-\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fswiss\fcharset0 Helvetica-Bold;}
 {\colortbl;\red255\green255\blue255;\red25\green60\blue255;\red25\green61\blue255;}
 {\*\expandedcolortbl;;\cssrgb\c12594\c35385\c100000;\cssrgb\c13005\c35866\c100000;}
 \margl1440\margr1440\vieww13580\viewh19780\viewkind0
@@ -22,6 +22,15 @@ Section 2- Smart Contracts with Solidity\
 - testing- need to set up custom Mocha to test solidity code\
 - deploying- set up deploy script to compile + deploy contract\
 \
+\
+39. Compiling Solidity\
+- our compile.js needs to take in contract source (.sol file) and output two files:\
+	- 
+\f1\b \ul ABI (Application Binary Interface)
+\f0\b0 \ulnone - JS Interpretation layer which lets us interact \
+	- Contract Bytecode (machine code)\
+- don\'92t use require( \'91file_path\'92 ) of contract file because node will execute that file!!\
+- we\'92ll be using built in modules to bring in contract sol file\
 \
 \
 \
