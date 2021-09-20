@@ -1,8 +1,10 @@
 {\rtf1\ansi\ansicpg1252\cocoartf2578
 \cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fswiss\fcharset0 Helvetica-Bold;}
-{\colortbl;\red255\green255\blue255;\red25\green60\blue255;\red25\green61\blue255;}
-{\*\expandedcolortbl;;\cssrgb\c12594\c35385\c100000;\cssrgb\c13005\c35866\c100000;}
-\margl1440\margr1440\vieww13580\viewh19780\viewkind0
+{\colortbl;\red255\green255\blue255;\red25\green60\blue255;\red25\green61\blue255;\red251\green0\blue7;
+\red26\green63\blue255;}
+{\*\expandedcolortbl;;\cssrgb\c12594\c35385\c100000;\cssrgb\c13005\c35866\c100000;\cssrgb\c100000\c12195\c0;
+\cssrgb\c13414\c36345\c100000;}
+\margl1440\margr1440\vieww12080\viewh16020\viewkind0
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
 \f0\fs28 \cf0 9/17/21\
@@ -23,14 +25,80 @@ Section 2- Smart Contracts with Solidity\
 - deploying- set up deploy script to compile + deploy contract\
 \
 \
-39. Compiling Solidity\
+39-40. Compiling Solidity\
 - our compile.js needs to take in contract source (.sol file) and output two files:\
 	- 
-\f1\b \ul ABI (Application Binary Interface)
-\f0\b0 \ulnone - JS Interpretation layer which lets us interact \
-	- Contract Bytecode (machine code)\
+\f1\b \cf4 \ul \ulc5 ABI (Application Binary Interface)
+\f0\b0 \cf0 \ulnone - JS Interpretation layer which lets us interact \
+	- Contract \cf4 Bytecode\cf0  (machine code)\
 - don\'92t use require( \'91file_path\'92 ) of contract file because node will execute that file!!\
 - we\'92ll be using built in modules to bring in contract sol file\
+\
+\
+41-43. Testing Architecture\
+- will deploy our bytecode to a Local Test Network\
+	- will use libraries called \cf2 Ganache CLI\cf0  (old name is \cf2 TestRPC\cf0 )\
+- \cf4 web3\cf0  = library to interact with deployed contract on the blockchain \
+	- helps us communicate between a JS app and the Ethereum network\
+	- video uses npm install web3@1.0.0-beta.26\
+- will use the ABI to interact with web3 (see lecture slide)\
+\
+\
+44. Web3 Versioning\
+- vast majority of documentation are all using the older web3 v0.x.x\
+	- only primitive syntax for callbacks only\
+- newer version v1.x.x has support for promises + async/await\
+\
+\
+45. Web3 Providers\
+- \cf4 Provider\cf0  = \
+	- communication layer between web3 library and some specific ethereum network\
+	- can think of the Provider as a telephone and a web3 instance and Ganache as two\
+	  people who are trying to communicate \
+	- \
+\
+\
+46-47. Mocha\
+\cf2 describe( \'93description\'94, cb ) \cf0 \
+Parameters:\
+- \'93description\'94 (string) = describes what you\'92re testing\
+- cb (callback) = \
+\
+\
+48-51. Web3\
+- we can use web3 to create/deploy contracts (need ABI & bytecode)\
+- also can use web3 to interact with existing deployed contracts (need ABI & address of contract)\
+\
+\
+gas vs gasPrice\
+\cf4 Gas\cf0  = \
+- \cf2 cost to do operations on the ethereum blockchain (VM)\cf0 \
+- Ex. Adding two numbers cost 3 Gas, Getting a balance of an account can cost 400 Gas\
+- the execution fee, paid by the sender of the transaction\
+- a smart contract could have multiple operations that could cost hundreds of thousands of Gas\
+\
+\cf4 gasPrice\cf0  = \
+- measured in GWEI (unit of ETH. 1 GWEI = .000000001 ETH)\
+- the amount of GWEI the user is willing to spend on 1 unit of gas\
+\
+Ex. \
+if I had a function on the smart contract that just added two numbers, that would cost 3 Gas. \
+And the current gasPrice = 100\
+The total amount I would pay to execute that function:  \
+\cf4 Total Fee (paid by sender) = Gas * gasPrice\cf0 \
+ = 3 * 100 = 300 Gas\
+\
+\
+\
+\cf4 Gas Limit\cf0 \
+- maximum amount of gas that a user is willing to pay for confirming a transaction\
+(Minimum of 21,000)\
+\
+\
+\
+\
+\
+\
 \
 \
 \

@@ -22,4 +22,4 @@ module.exports = solc.compile(source, 1).contracts[":Inbox"]; // 1 = # of files 
 // }
 
 // interface = ABI (Application Binary Interface), lists out all the different functions that
-//   exist on the contract
+//   exist on the contract, also specifies arguments/return values
