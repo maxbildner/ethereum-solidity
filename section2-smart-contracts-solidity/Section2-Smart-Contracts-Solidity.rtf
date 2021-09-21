@@ -4,7 +4,7 @@
 \red26\green63\blue255;}
 {\*\expandedcolortbl;;\cssrgb\c12594\c35385\c100000;\cssrgb\c13005\c35866\c100000;\cssrgb\c100000\c12195\c0;
 \cssrgb\c13414\c36345\c100000;}
-\margl1440\margr1440\vieww12080\viewh16020\viewkind0
+\margl1440\margr1440\vieww13580\viewh16080\viewkind0
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
 \f0\fs28 \cf0 9/17/21\
@@ -55,7 +55,8 @@ Section 2- Smart Contracts with Solidity\
 	- communication layer between web3 library and some specific ethereum network\
 	- can think of the Provider as a telephone and a web3 instance and Ganache as two\
 	  people who are trying to communicate \
-	- \
+	- see slides 45 and 55\
+	- instructs web3 library what blockchain network we\'92re connecting to (ex. Main ETH net, rinkeby test)\
 \
 \
 46-47. Mocha\
@@ -88,11 +89,37 @@ The total amount I would pay to execute that function:  \
 \cf4 Total Fee (paid by sender) = Gas * gasPrice\cf0 \
  = 3 * 100 = 300 Gas\
 \
-\
-\
 \cf4 Gas Limit\cf0 \
 - maximum amount of gas that a user is willing to pay for confirming a transaction\
 (Minimum of 21,000)\
+\
+\
+55-56. Deployment to Rinkeby Network\
+- 1) we take our account Mnemonic and plug it into the Provider \
+- 2) \cf4 Infura API\cf0 \
+	- public API\
+	- lets us get access to a node on the test network (ex. Rinkeby)\
+	- helps us deploy/get access to the network\
+	- if we didn\'92t have Infura, we would have to host our own Node on our local machine\
+\
+\
+\
+60. If we get an error in terminal: Error transaction underpriced\
+- this is due to the EIP 1599 hard fork\
+- to prevent this we need to specify a gasPrice with an amount high enough to ensure the transaction\
+  Will get mined quickly:\
+\pard\pardeftab720\partightenfactor0
+\cf0 .send(\{ gas: '1000000', gasPrice: '5000000000', from: accounts[0] \});\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 \
+\
+61-65\
+- we could build some HTML/CSS/JS application to interact with the deployed smart contract\
+- \cf2 https://rinkeby.etherscan.io/\cf0 \
+	- lets us read transactions into the test ETH networks\
+	- type the address of the deployed contract into the search bar to see more info\
+- can interact with deployed contract in \ul remix\
+\ulnone -   \
 \
 \
 \
@@ -104,7 +131,13 @@ The total amount I would pay to execute that function:  \
 \
 \
 QUESTIONS\
-- \
+- RE: deploy.js, regarding .send(\{gas:1,000,000, gasPrice:5,000,000,000, from\})\
+  - need to confirm what gas vs gasPrice represents\
+  - who determines those numbers?/why did the video input 1m and 1b?\
+\
+- Why doesn\'92t calling a function cost anything?\
+	- servers still have to respond, and doesn\'92t that take up electricity/bandwidth?\
+\
 \
 \
 \
