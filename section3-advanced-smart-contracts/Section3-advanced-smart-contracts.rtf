@@ -1,0 +1,131 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2578
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fswiss\fcharset0 Helvetica-Bold;}
+{\colortbl;\red255\green255\blue255;\red25\green60\blue255;\red251\green0\blue7;\red0\green0\blue0;
+\red0\green0\blue0;\red26\green63\blue255;}
+{\*\expandedcolortbl;;\cssrgb\c12594\c35385\c100000;\cssrgb\c100000\c12195\c0;\cssrgb\c0\c1\c1;
+\cssrgb\c0\c0\c0;\cssrgb\c13414\c36345\c100000;}
+\margl1440\margr1440\vieww13580\viewh18460\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs28 \cf0 9/21/21\
+Ethereum & Solidity Course Notes\
+https://www.udemy.com/course/ethereum-and-solidity-the-complete-developers-guide/\
+Section 3- Advanced Smart Contracts\
+\
+66-67) Building a Lottery App\
+- Lottery Contract\
+- when people send ETH to the Prize Pool in the Lottery Contract, they become Players\
+- Manager tells Lottery Contract to pick a winner\
+- then Contract will pick winner and send ETH to winner, then resets\
+- see lecture slide 3-2-67 for Smart Contract Class Design\
+- Enter = function in the smart contract that someone can \'93send a transaction to\'94 to enter a\
+Player in the lottery\
+\
+\
+69) \cf2 Solidity Variable Types\cf0 \
+- see lecture slide 3-3-69 for table of variable types\
+\cf3 Address\cf0  Type\
+	- contains ethereum address\
+String\
+Bool\
+\cf3 fixed\
+	\cf4 Fixed Point Number = number with a decimal  Ex. 20.001, -1.03\
+\cf3 ufixed\cf4 \
+	Unfixed Point Number = positive number with decimal\cf3 \
+int\cf0 \
+	Integer. Positive or Negative. \ul Has no decimal\ulnone . Ex 0, -300, 200\
+\cf3 uint\cf0 \
+	\cf3 Unsigned\cf0  Integer. Positive number. Has no decimal. Ex 0, 300, 200\
+\
+Integer Ranges\
+- number after int or uint = \cf2 specifies number of bits used to store this number\cf0 \
+- the number of bits used to store a number specifies how large/small a number can be\
+- if you\'92re ever unsure what size to choose, you can always just choose biggest (int256 = int)\
+- but you do have to pay for the extra storage\
+- see slide 3-4-69\
+Ex. \
+	\cf3 int8\cf0  = means there are 8 bits used to store this number. (Only hold values from -128 to 127)\
+	int = \cf3 int256\cf0  same thing\
+\cf3 bit (Binary digIT)\cf0  = 0 or 1, off or on\
+\
+71) \cf3 Global Message Variable\cf0  / Object (\cf3 msg\cf0 )\
+- properties on it like who sent the transaction to the network, and details about the transaction \
+- global variable that's available to any function \
+- MSG PROPERTIES:    1\
+	1) msg.data = includes contract source code (for contract creation) and any arguments of functions\
+ 	2) msg.gas = amount of gas available to us to run our code (rarely used)\
+	3) \cf2 msg.sender\cf0  = address of the account that started the function invokation \
+	4) \cf2 msg.value\cf0  = amount of ether (in wei) that was sent along with the function invokation\
+\
+\
+72) \cf3 Reference Type\cf0  Variable\
+\cf3 Fixed Array\cf0 \
+	- contains a \ul single type\ulnone  of element, \ul fixed length\ulnone  (unlike in JS)\
+	Ex. \cf2 int[ 3 ]\cf0 		// has size 3\
+\cf3 Dynamic Array\cf0 \
+	-  contains a \ul single type\ulnone  of element. Length can change over time\
+	Ex1. \cf2 int[ ]\cf0  		// leave brackets blank\
+\
+\
+\
+72. Arrays\
+- getter method from storage variables that are arrays do NOT return the entire array!!\
+  They take in an index, and return the element at that index\
+- you can create your own method that returns the entire array\
+   See test.sol \
+- the above only works for arrays of simple data types like integers / booleans.\
+  It would NOT work for an array of arrays or an array of structs\
+Ex. Create a dynamic array of unsigned integers (with a getter method) called myArray\
+\cf2 	uint[ ] public myArray;\cf0 \
+\
+73. Mapping and Struct Variable Types\
+\cf3 Mapping\cf0 \
+- Collection of key value pairs (like JavaScript Objects, ruby hashes, or python dictionaries)\
+- All keys must be the same type, and all values must be the same type\
+- the set of keys and the set of values don\'92t have to be the same type\
+Ex. Create a Mapping called myPantry with keys of type string, and values of type integer\
+\cf2 	mapping( string => int256 ) public myPantry;\cf0  \
+\
+\cf3 Struct\cf0 \
+- a collection of key value pairs that can have different types\
+- usually used to represent a singular thing (ex. House, car, \'85 )\
+Ex. Create a struct called Car with properties of make, model, and value\
+	\cf2 struct Car \{\
+		string make;\
+		string model;\
+		uint value;\
+	\}\cf0 \
+\
+\
+74. Big Solidity Gotchas!\
+1) \
+- in solidity you CAN make nested dynamic arrays (2D arrays of dynamic lengths)\
+- there is\cf5  
+\f1\b \ul NO way yet to pull nested dynamic arrays from solidity to ABI/JS/Web3!!!
+\f0\b0 \cf0 \ulnone \
+	- this is not a limitation of solidity or JS, but a limitation of the bridge between\
+	  solidity and JS (Web3?)\
+2)\
+- \cf2 strings in solidity are represented as dynamic arrays\cf0 !!\
+- that means we 
+\f1\b \ul can NOT transfer arrays of strings over to javascript
+\f0\b0 \ulnone \
+	- however, there are ways to get around this\
+\
+\
+76. Validation\
+- \cf3 require( boolean_expression );\cf0 \
+- if the boolean_expression is false, the entire function stops and exits!\
+- if boolean_expression is true, then code runs as usual\
+- Ex. If someone is entering the lottery, they need to send ether\
+\
+\
+\
+\
+\
+\
+QUESTIONS\
+- \
+\
+\
+}
