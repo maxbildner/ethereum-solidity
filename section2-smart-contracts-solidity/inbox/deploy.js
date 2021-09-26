@@ -1,5 +1,5 @@
 // import PROVIDER = allows us to connect web3 instance with Specific Network
-// (ex. ganache local, or rinkeby, ...))
+// (ex. ganache local, or rinkeby, ...)
 const HDWalletProvider = require("truffle-hdwallet-provider");
 
 // note Web3 is uppercase!! bec. we are importing a constructor function
@@ -8,7 +8,7 @@ const HDWalletProvider = require("truffle-hdwallet-provider");
 const Web3 = require("web3");
 
 // import bytcode and ABI
-// - ABI = (JS interpretation layer that allows us to interact with bytecode)
+// - ABI = (JSON) interpretation layer that allows us to interact with bytecode)
 const { interface, bytecode } = require("./compile");
 
 const MNEMONIC_PHRASE = require("./mnemonic");
