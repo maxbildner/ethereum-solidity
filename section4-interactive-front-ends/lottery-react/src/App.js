@@ -1,9 +1,15 @@
 import logo from "./logo.svg";
 import "./App.css";
 import React from "react";
+import web3 from "./web3";
 
 class App extends React.Component {
   render() {
+    // console.log(web3.version); //=> 1.5.3
+
+    // log ethereum address to console
+    // web3.eth.getAccounts().then(console.log);
+
     return (
       <div className="App">
         <header className="App-header">
@@ -25,5 +31,3 @@ class App extends React.Component {
   }
 }
 export default App;
-
-let test = 1;

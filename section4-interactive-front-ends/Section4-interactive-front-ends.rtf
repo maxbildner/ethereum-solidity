@@ -30,6 +30,17 @@ The web3 Library into any active page!!!
 - assumption is that user has Metamask installed!\
 	  \
 \
+104. \
+To prevent Error:transaction underpriced (due to changes in EIP 1599)\
+- when we deploy our contract, we need to specify gasPrice w/ amount high enough\
+.send(\{gas: \'911000000\'92, gasPrice: \'915000000000\'92 from:accounts[0] \} );\
+\
+\
+105. Deploying lottery contract\
+- feeding ABI into web3 instance, creates local copy of contract\
+- then deploy contract and tell web3 what address to deploy the contract at\
+- see slide 4-5-105\
+\
 \
 \
 \
