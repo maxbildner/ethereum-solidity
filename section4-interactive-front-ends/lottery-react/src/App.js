@@ -1,4 +1,3 @@
-import logo from "./logo.svg";
 import "./App.css";
 import React from "react";
 import web3 from "./web3";
@@ -8,7 +7,9 @@ import lottery from "./lottery";
 
 class App extends React.Component {
   // use ES2016 sytnax, instead of constructor method
-  state = { manager: "", players: [], balance: "", value: "" };
+  state = { manager: "", players: [], balance: "", value: "", message: "" };
+  // message = loading message/info about status of transaction
+  // value = ether to enter to lottery
 
   // constructor(props) {
   //   super(props);
@@ -38,13 +39,23 @@ class App extends React.Component {
     this.setState({ manager, players, balance });
   }
 
+  // send a transaction to the enter function on our lottery contract
   onClickEnter = async (event) => {
     // prevent classic way of form submission
     event.preventDefault();
 
-    // get list of all eth account addresses
+    // alert and exit of value < .01 ether
+    if (this.state.value <= 0.01) {
+      alert("Must enter more than .01 Ether!");
+      return;
+    }
+
+    // get list of all eth account addresses (in this case from metamask connected)
     const accounts = await web3.eth.getAccounts();
     // => returns a promise that resolves to a list of accounts
+
+    // message = loading message/status of transaction
+    this.setState({ message: "Waiting on transaction success..." });
 
     // send transaction to the network (could take 15-30 seconds)
     await lottery.methods.enter().send({
@@ -54,6 +65,22 @@ class App extends React.Component {
       value: web3.utils.toWei(this.state.value, "ether"),
       // - amount of money we want to enter into the lottery contract
     });
+
+    this.setState({ message: "You have been entered!" });
+  };
+
+  onClickPickWinner = async (event) => {
+    // get list of active accounts (in this case provided by metamask)
+    const accounts = await web3.eth.getAccounts();
+
+    this.setState({ message: "Waiting on transaction success..." });
+
+    await lottery.methods.pickWinner().send({
+      // specify who is sending the transaction
+      from: accounts[0],
+    });
+
+    this.setState({ message: "A winner has been picked!" });
   };
 
   render() {
@@ -62,6 +89,7 @@ class App extends React.Component {
     // log ethereum address to console
     // web3.eth.getAccounts().then(console.log);
     // - ? whey async await not needed above?
+    console.log(this.state.message);
 
     return (
       <div className="App">
@@ -74,7 +102,7 @@ class App extends React.Component {
 
         {/* add horizontal divider for style */}
         <hr />
-        <form>
+        <form onSubmit={this.onClickEnter}>
           <h4>Want to try your luck?</h4>
           <div>
             <label>Amount of ether to enter</label>
@@ -83,10 +111,16 @@ class App extends React.Component {
               // value={this.state.value}
               onChange={(event) => this.setState({ value: event.target.value })}
             />
-            {/* send a transaction to the enter function on our lottery contract  */}
-            <button onSubmit={this.onClickEnter}>Enter</button>
           </div>
+          <button>Enter</button>
         </form>
+
+        <hr />
+        <h4>Ready to pick a winner?</h4>
+        <button onClick={this.onClickPickWinner}>Pick a winner!</button>
+        <hr />
+
+        <h1>{this.state.message}</h1>
       </div>
     );
   }
