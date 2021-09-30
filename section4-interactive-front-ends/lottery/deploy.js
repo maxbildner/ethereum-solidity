@@ -12,7 +12,7 @@ const Web3 = require("web3");
 // - ABI = (JSON) interpretation layer that allows us to interact with bytecode)
 const { interface, bytecode } = require("./compile");
 
-const MNEMONIC_PHRASE = require("./mnemonic");
+const MNEMONIC_PHRASE2 = require("./mnemonic_phrase");
 
 // set up provider
 // - specificy which account we want to unlock
@@ -23,7 +23,7 @@ const MNEMONIC_PHRASE = require("./mnemonic");
 //        and this account doesn't have any real ether, only test ether
 //    - url (string) = API endpoint we want to connect to
 const provider = new HDWalletProvider(
-  MNEMONIC_PHRASE,
+  MNEMONIC_PHRASE2,
   "https://rinkeby.infura.io/v3/cc1f96fdcbee424ab0e5ab4671563c23"
 );
 
@@ -61,7 +61,7 @@ const deploy = async () => {
   console.log(interface);
 
   console.log("Contract deployed to", result.options.address);
-  // result.options.address => 0x7F26eEF2d246590e863eA8d4506ea2518bAb4C80
+  // result.options.address => 0x0b77c2D0227DdDEef02b93B92881DcDBCaAb77d7
 };
 
 deploy();
