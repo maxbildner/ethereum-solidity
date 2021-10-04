@@ -57,7 +57,10 @@ contract Campaign {
     public restricted {
     
     // create a new variable called newRequest, of type Request
-    Request newRequest = Request({
+    // - must add memory keyword below!! or else we'll get warning
+    // Request newRequest = Request({
+          
+      Request memory newRequest = Request({
       description: description,
       value: value,
       recipient: recipient,

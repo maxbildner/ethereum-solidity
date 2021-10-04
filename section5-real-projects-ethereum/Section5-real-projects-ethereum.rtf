@@ -1,8 +1,8 @@
 {\rtf1\ansi\ansicpg1252\cocoartf2580
-\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fswiss\fcharset0 Helvetica-Bold;}
 {\colortbl;\red255\green255\blue255;}
 {\*\expandedcolortbl;;}
-\margl1440\margr1440\vieww10700\viewh16080\viewkind0
+\margl1440\margr1440\vieww11160\viewh21400\viewkind0
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
 \f0\fs28 \cf0 10/1/21\
@@ -31,6 +31,30 @@ Campaign = Crowdfund\
 \
 \
 \
+126. Storage and Memory\
+- Common error Messages! \
+	Warning: \'93Variable is declared as storage pointer\'94\'85.\
+	TypeError: \'93Memory is not implicitly convertible\'94\'85\
+	- happened when I created a new variable and assigned it\
+	a new custom struct object \
+- Storage VS Memory\
+- Sometimes storage and memory means \ul where our contract stores data\ulnone  (ex. Where it stores arrays, integers)\
+	- 
+\f1\b \ul Storage
+\f0\b0 \ulnone  = holds data between function calls (like a computer hard drive). About\
+	preserving data\
+	Ex. Variable definitions initialized at top of contract\
+		- persists after turning off computer!!\
+	- 
+\f1\b \ul Memory
+\f0\b0 \ulnone  = very temporary!! (Like a computer\'92s RAM)\
+	Ex. Arguments to functions (after function is complete, those variables gone)\
+- Sometimes storage and memory references \ul how our solidity variables stores values in our contract\ulnone \
+\
+\
+127. More on Storage vs Memory\
+- Sometimes storage and memory references \ul how our solidity variables stores values in our contract\ulnone \
+	- \
 \
 \
 QUESTIONS\
