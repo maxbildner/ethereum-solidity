@@ -28,7 +28,7 @@ contract Numbers {
     // 2) 
     // MEMORY keyword
     // int[] memory myArray = numbers;
-    // - solidity would make a copy of the numbers array and put it into memeroy
+    // - "solidity would make a copy of the numbers array and put it into memory"
     // - then myArray would no longer point to the numbers in storage
     // - ? is the copy a deep copy?
     
