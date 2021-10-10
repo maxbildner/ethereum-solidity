@@ -33,8 +33,12 @@ contract Campaign {
 
   // create mapping, where keys = addresses of donators, values = booleans of weather they donated to contract
   // - default value for mapping if undefined key is boolean = false
+  // - we can NOT iterate through values of mapping, or retrieve entire mapping
   mapping (address => bool) public approvers;
-  
+
+  // number of people in approvers object (mapping)
+  uint public approversCount;
+
   // create a modifier called restricted
   modifier restricted() {
     require(msg.sender == manager);
@@ -61,6 +65,9 @@ contract Campaign {
     // add key to approvers mapping of msg.sender, with a value of true
     approvers[msg.sender] = true;
     // - ? the address msg.sender does NOT get stored in the mapping! only the value true?
+    
+    // increment number of people who have donated by 1
+    approversCount++;
   }
   
   
@@ -103,7 +110,7 @@ contract Campaign {
     require(approvers[msg.sender], "You must be a donator to this campaign");
 
     // make sure person calling this method hasn't voted before
-    require(!request.approvals[msg.sender]);
+    require(!request.approvals[msg.sender], "You have already voted!");
   
     // increment approvalCount for specific request by 1
     request.approvalCount++;
@@ -111,5 +118,29 @@ contract Campaign {
     // caller of approval votes yes on request
     request.approvals[msg.sender] = true;
     // - not voting at all = no vote
+  }
+  
+
+  // called by manager after request has gotten enough approvals
+  // - managerr can call this to get money sent to vendor
+  // - index = index of requests array that the manager
+  function finalizeRequest(uint index) public restricted {
+      
+    // create local variable to represent request object
+    // - STORAGE = makes variable point directly at exact same location 
+    //   that numbers variable is pointing at (see slide 5-11-127)
+    Request storage request = requests[index];
+      
+    // make sure request is NOT already marked as complete
+    require(!request.complete, "Request is already complete!");
+    
+    // more than 50% of donators must have approved this request
+    require(request.approvalCount > approversCount/2);
+    
+    // send money to vendor
+    request.recipient.transfer(request.value);
+    
+    // update the complete flag to be true after paying vendor
+    request.complete = true;
   }
 }
