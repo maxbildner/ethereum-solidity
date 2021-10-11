@@ -2,6 +2,33 @@
 /// - use compiler version 0.4.17 (^ means won't work for versions above 0.5 or newer)
 pragma solidity ^0.4.17;  
 
+// FACTORY campaign
+// - contract that deploys another contract
+// - abstracts main campaign code so user can't modify it
+contract CampaignFactory {
+  
+  // holds list of addresses of all deployed campaigns
+  address[] public deployedCampaigns;
+  
+  // minimum = min contribution when people donate
+  function createCampaign(uint minimum) public {
+    
+    // deploy new contract to the blockchain
+    // - msg.sender = address of person creating the campaign (i.e. the manager)
+    address newCampaign = new Campaign(minimum, msg.sender);
+    
+    deployedCampaigns.push(newCampaign);
+  }
+  
+  
+  // getter method, that returns array of addresses (campaign contracts)
+  // VIEW = no data of the contract is modified by this function
+  function getDeployedCampaigns() public view returns (address[]){
+    return deployedCampaigns;
+  }
+}
+
+
 // kick starter campaign
 contract Campaign {
     
@@ -36,8 +63,11 @@ contract Campaign {
   // - we can NOT iterate through values of mapping, or retrieve entire mapping
   mapping (address => bool) public approvers;
 
-  // number of people in approvers object (mapping)
+  // number of donators- people in approvers object (mapping)
   uint public approversCount;
+
+  // how much money (Wei) people have donated to this campaign
+  uint public totalContributions; 
 
   // create a modifier called restricted
   modifier restricted() {
@@ -46,12 +76,16 @@ contract Campaign {
   }
   
   
-  // minimum (wei)
-  function Campaign(uint minimum) public {
+  // minimum (wei) contribution when people donate
+  // - returns address of the newly created campaign
+  function Campaign(uint minimum, address senderAddress) public {
       
     // msg = global variable with sender (address) of who sent the transaction
-    manager = msg.sender;
+    // don't want below because msg.sender will refer to address of Factory Campaign!
+    // manager = msg.sender;
     
+    manager = senderAddress;
+     
     minimumContribution = minimum;
   }
   
@@ -68,6 +102,8 @@ contract Campaign {
     
     // increment number of people who have donated by 1
     approversCount++;
+    
+    totalContributions += msg.value;
   }
   
   
@@ -100,7 +136,7 @@ contract Campaign {
 
   // called by approver (donator) to approve/vote on a specific request
   // index = index of request caller of method is trying to approve
-  function approveRequest(uint index) {
+  function approveRequest(uint index) public {
     // want to manipualte request variable, so use keyword "storage"
     // - saving reference to request so we don't have to keep calling requests[index]
     Request storage request = requests[index];
@@ -135,7 +171,7 @@ contract Campaign {
     require(!request.complete, "Request is already complete!");
     
     // more than 50% of donators must have approved this request
-    require(request.approvalCount > approversCount/2);
+    require(request.approvalCount > approversCount/2, "More than 50% of donators must have approved this request!");
     
     // send money to vendor
     request.recipient.transfer(request.value);

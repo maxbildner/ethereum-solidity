@@ -3,7 +3,7 @@
 }
 {\colortbl;\red255\green255\blue255;\red25\green60\blue255;}
 {\*\expandedcolortbl;;\cssrgb\c12594\c35385\c100000;}
-\margl1440\margr1440\vieww11180\viewh20060\viewkind0
+\margl1440\margr1440\vieww11180\viewh16080\viewkind0
 \pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
 \f0\fs28 \cf0 10/1/21\
@@ -91,11 +91,11 @@ That the array size will not grow to huge amounts\ulnone !!\
 	- can\'92t get a list of keys\
 	- Ex. Can\'92t do something like Object.keys( mapping )\
 - 
-\f1\b \cf2 \ul \ulc2 Values are NOT iterable!!
+\f1\b \cf2 \ul Values are NOT iterable!!
 \f0\b0 \cf0 \ulnone \
 	- can\'92t run loop :(\
 - 
-\f1\b \cf2 \ul \ulc2 All keys exist
+\f1\b \cf2 \ul All keys exist
 \f0\b0 \cf0 \ulnone \
 	- won\'92t get undefined for key that\'92s not defined like in JS\
 	- default value returned for undefined key will depend on key data type\
@@ -103,8 +103,18 @@ That the array size will not grow to huge amounts\ulnone !!\
 \
 \
 \
-\
-\
+140-141. Thinking About Deployment\
+- Whenever we deploy a contract, we are deploying an Instance of it to the network (ex. Rinkeby)\
+- Solution 1 (see slide) sucks because a user could modify the contract source code before deploying it! User deploys contract (pays for it?)\
+- Solution 2- solves solution 1 security problem, but is expensive! Every time we deploy a contract, it costs money. \
+- Solution 3- Hybrid\
+	- before we release our application, we create a \'93\ul factory\ulnone \'94 contract\
+	- it has a function to deploy a new instance of \'93Campaign\'94\
+	- 
+\f2\i contracts can deploy other contracts!\
+
+\f0\i0 	- user pays deployment costs, and we have control of code being deployed!\
+	- factory will also have a list of all deployed contracts\
 \
 \
 \
@@ -117,7 +127,8 @@ QUESTIONS\
 
 \f1\b \ul - Can mappings have values that are functions? (Like in JS)\
 
-\f0\b0 \ulnone \
+\f0\b0 \ulnone - in Lecture 140, @5:24, does solution 1 mean that the contract source code is sent from a server? Not from the blockchain?\
+	- looks like yes!\
 \
 \
 \
