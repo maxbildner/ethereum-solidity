@@ -25,7 +25,7 @@ beforeEach(async () => {
   accounts = await web3.eth.getAccounts();
   // => returns a promise that resolves to a list of accounts
 
-  // Use one of thoese accounts to deploy the contract
+  // Use one of those accounts to deploy the contract
   // create a JS instance of a contract
   // - interface tells web3 what methods the Inbox contract has
   // - has a methods property (with methods defined in the .sol file)

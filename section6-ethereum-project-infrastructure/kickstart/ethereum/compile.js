@@ -29,11 +29,14 @@ const output = solc.compile(source, 1).contracts;
 
 // rercreate build folder
 fs.ensureDirSync(buildPath);
+// console.log(output); //=> obj will contain two keys ':Campaign', and ':CampaignFactory'
+// - each of the values in the two keys contains the bytecode and interface (ABI) of each contract
 
-// loop over contract object abd write outputs to the build directory
+// loop over contract object and write outputs to the build directory
 for (let contract in output) {
+  // write out to a JSON an object that has both the bytecode and interface of 1 contract
   fs.outputJsonSync(
-    path.resolve(buildPath, contract + ".json"),
+    path.resolve(buildPath, contract.replace(":", "") + ".json"),
     output[contract]
   );
 }
