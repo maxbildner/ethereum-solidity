@@ -42,6 +42,8 @@ contract Campaign {
     address recipient;                  // vendor who is receiving money
     bool complete;                      // has request been completed (sent?)
     uint approvalCount;                 // number of people who have approved request
+
+    // NOTE* we do NOT have access to this method approvals below because we can't retrieve an entire mapping!
     mapping(address => bool) approvals; // people (address) who have approved request
   }
   
