@@ -1,7 +1,7 @@
-import { loadGetInitialProps } from "next/dist/shared/lib/utils";
 import React, { useEffect, useState } from "react"
 import factory from '../ethereum/factory';
-
+import 'semantic-ui-css/semantic.min.css';
+import { Card, Button } from 'semantic-ui-react';
 
 
 class CampaignIndex extends React.Component {
@@ -29,7 +29,6 @@ class CampaignIndex extends React.Component {
     return(
       <React.Fragment>
         <h1>This is campaign list page!!</h1>
-        {/* <p>{this.props.campaigns[0]}</p> */}
         <p>{this.props.campaigns[0]}</p>
       </React.Fragment>
     )
