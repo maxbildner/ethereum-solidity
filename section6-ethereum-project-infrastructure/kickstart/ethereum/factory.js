@@ -8,9 +8,9 @@ import web3 from './web3';
 import CampaignFactory from './build/CampaignFactory.json'
 
 // create new contract instance
-const instance = new web3.eth.Contract(
-  JSON.parse(CampaignFactory.interface),      // contract abi
-  0xdfa4Fe144f7Ae649d9AbE00E8F0CCc277430c79a  // address of campaign factory smart contract
+const factory = new web3.eth.Contract(
+  JSON.parse(CampaignFactory.interface),        // contract abi
+  '0xdfa4Fe144f7Ae649d9AbE00E8F0CCc277430c79a'  // address of campaign factory smart contract
 );
 
-export default instance;
+export default factory;
