@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import factory from "../ethereum/factory";
-// import "semantic-ui-css/semantic.min.css";
 import { Card, Button } from "semantic-ui-react";
 import Layout from "../components/Layout";
 // import "../styles/index.css";  // can't do this with Next.js!!
+import { Link } from "../routes"; // configuration object from next-routes library
 
 class CampaignIndex extends React.Component {
   // STATIC keyword = defines a class function (rather than instance method)
@@ -29,7 +29,11 @@ class CampaignIndex extends React.Component {
     const items = this.props.campaigns.map((address, idx) => {
       return {
         header: address,
-        description: <a>View Campaign</a>,
+        description: (
+          <Link route={`/campaigns/${address}`}>
+            <a>View Campaign</a>
+          </Link>
+        ),
         fluid: true, // cards will stretch entire width of container
       };
     });
@@ -43,13 +47,17 @@ class CampaignIndex extends React.Component {
       <Layout>
         {/* <p>{this.props.campaigns[0]}</p> */}
         <h3>Open Campaigns</h3>
-        <Button
-          content="Create Campaign"
-          icon="add circle" // + with circle around it
-          // primary={true} == same as below
-          primary // blue color
-          floated="right" // css- float: right
-        />
+        <Link route="/campaigns/new">
+          <a>
+            <Button
+              content="Create Campaign"
+              icon="add circle" // + with circle around it
+              // primary={true} == same as below
+              primary // blue color
+              floated="right" // css- float: right
+            />
+          </a>
+        </Link>
         <div>{this.renderCampaigns()}</div>
       </Layout>
     );
