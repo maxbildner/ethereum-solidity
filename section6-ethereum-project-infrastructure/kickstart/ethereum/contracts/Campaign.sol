@@ -184,6 +184,7 @@ contract Campaign {
 
 
   // returns a bunch of info (1 call to contract better than making 4 separate calls)
+  // returns object (looks like array with keys,0,1,2,3,4 and values below)
   function getSummary() public view returns (
     uint, uint, uint, uint, address
   ) {

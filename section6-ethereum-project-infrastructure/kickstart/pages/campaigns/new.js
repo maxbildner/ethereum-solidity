@@ -27,6 +27,7 @@ class CampaignNew extends React.Component {
         });
 
       // redirect user to home page
+      // - pushRoute makes url available in history (see replaceRoute if we don't want url to be in history)
       Router.pushRoute("/");
     } catch (err) {
       console.log(err);
@@ -37,12 +38,14 @@ class CampaignNew extends React.Component {
   };
 
   render() {
+    const { loading, errorMessage } = this.state;
+
     return (
       <Layout>
         <h3>Create a Campaign</h3>
 
         {/* only display error message if it exists (non empty string) */}
-        <Form onSubmit={this.onSubmit} error={!!this.state.errorMessage}>
+        <Form onSubmit={this.onSubmit} error={!!errorMessage}>
           <Form.Field>
             <label>Minimum Contribution (100 wei):</label>
             <Input
@@ -53,11 +56,12 @@ class CampaignNew extends React.Component {
               onChange={(e) =>
                 this.setState({ minimumContribution: e.target.value })
               }
+              disabled={loading}
             />
           </Form.Field>
 
-          <Message error header="Error:" content={this.state.errorMessage} />
-          <Button loading={this.state.loading} primary>
+          <Message error header="Error:" content={errorMessage} />
+          <Button loading={loading} primary disabled={loading}>
             Create Campaign
           </Button>
         </Form>
