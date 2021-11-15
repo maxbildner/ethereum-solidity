@@ -181,4 +181,22 @@ contract Campaign {
     // update the complete flag to be true after paying vendor
     request.complete = true;
   }
+
+
+  // returns a bunch of info (1 call to contract better than making 4 separate calls)
+  function getSummary() public view returns (
+    uint, uint, uint, uint, address
+  ) {
+    return(
+      minimumContribution,
+      this.balance,    // campaign balance (balance is a built in attribute on contract)
+      requests.length,
+      approversCount,
+      manager
+    );
+  }
+
+  function getRequestsCount() public view returns(uint) {
+    return requests.length;
+  }
 }

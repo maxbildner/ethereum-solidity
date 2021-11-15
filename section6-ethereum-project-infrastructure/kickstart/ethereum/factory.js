@@ -10,7 +10,7 @@ import CampaignFactory from './build/CampaignFactory.json'
 // create new contract instance
 const factory = new web3.eth.Contract(
   JSON.parse(CampaignFactory.interface),        // contract abi
-  '0xdfa4Fe144f7Ae649d9AbE00E8F0CCc277430c79a'  // address of campaign factory smart contract
+  '0xe27A0814E5d573Aa1B140CC131d0D6236A645ba4'  // address of campaign factory smart contract
 );
 
 export default factory;

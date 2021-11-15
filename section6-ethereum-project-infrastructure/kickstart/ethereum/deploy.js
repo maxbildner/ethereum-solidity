@@ -68,7 +68,9 @@ const deploy = async () => {
   console.log(compiledFactory.interface);
 
   console.log("Contract deployed to", result.options.address);
-  // result.options.address => 0xdfa4Fe144f7Ae649d9AbE00E8F0CCc277430c79a
+  // result.options.address => 
+  // new contract address 0xe27A0814E5d573Aa1B140CC131d0D6236A645ba4
+  // old contract address 0xdfa4Fe144f7Ae649d9AbE00E8F0CCc277430c79a
 };
 
 deploy();
