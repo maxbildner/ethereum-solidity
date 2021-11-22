@@ -7,13 +7,21 @@ import { Link } from "../routes"; // configuration object from next-routes libra
 
 class CampaignIndex extends React.Component {
   // STATIC keyword = defines a class function (rather than instance method)
-  // this function runs once on server (do this instead of fetching data in componentDidMount)
+  // - this function runs once on server (do this instead of fetching data in componentDidMount)
+  // - runs also on client if navigating from a different route via the Link (next.js) Component
+  //    - Client Lifecycle Methods Order:
+  //        getInitialProps -> constructor -> render -> componentDidMount
   static async getInitialProps() {
-    // get array of addresses of all deployed campaigns
-    const campaigns = await factory.methods.getDeployedCampaigns().call();
+    try {
+      // get array of addresses of all deployed campaigns
+      const campaigns = await factory.methods.getDeployedCampaigns().call();
 
-    // object is going to be provided to component as props
-    return { campaigns: campaigns };
+      // object is going to be provided to component as props
+      return { campaigns: campaigns };
+    } catch (err) {
+      console.log(err);
+      return { campaigns: [] };
+    }
   }
 
   // use above function (getInitialProps) instead of this

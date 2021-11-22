@@ -8,13 +8,15 @@ import Web3 from "web3";
 // below won't work because window is undefined in node.js (but not on browser)
 // window.ethereum.request({method: "eth_requestAccounts"});
 
-
 // NEW Version 2.0:
 let web3;
 
-// if this code is run in the browser And the user has metamask
-if (typeof window !== "undefined" && typeof window.ethereum !== "undefined") {
-  window.ethereum.request({method: "eth_requestAccounts"});
+if (
+  typeof window !== "undefined" && // code is run in the browser
+  typeof window.ethereum !== "undefined" && // user has metamask
+  window.ethereum.networkVersion === "4" // client metamask network is Rinkby Test
+) {
+  window.ethereum.request({ method: "eth_requestAccounts" });
 
   // create instance of web3, pass in provider from metamask
   web3 = new Web3(window.ethereum);
@@ -27,7 +29,5 @@ if (typeof window !== "undefined" && typeof window.ethereum !== "undefined") {
 
   web3 = new Web3(provider);
 }
-
-
 
 export default web3;
