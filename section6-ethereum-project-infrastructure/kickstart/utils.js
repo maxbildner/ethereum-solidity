@@ -24,4 +24,20 @@ const metaMaskIsInstalled = () => {
 //   return !!form
 // }
 
-export { connectedToCorrectNetwork, metaMaskIsInstalled };
+// returns true if input string is a number
+// "2" => true
+// "2a" => false
+// "a2" => false
+// "1.0a" => false
+// "1." => true
+const isNumber = (str) => {
+  return !isNaN(parseFloat(str)) && !isNaN(str);
+};
+// console.log(isNumber("2")); // true
+// console.log(isNumber("2.0")); // true
+// console.log(isNumber("2.")); // true
+// console.log(isNumber("2a")); // false
+// console.log(isNumber("a2")); // false
+// console.log(isNumber("asd")); // false
+
+export { connectedToCorrectNetwork, metaMaskIsInstalled, isNumber };

@@ -28,12 +28,6 @@ class CampaignNew extends React.Component {
         this.setState({
           errorMessage: "You must be connected to the Rinkby Test Network!",
         });
-
-        // exit if minimumContribution is < 100
-      } else if (this.state.minimumContribution < 100) {
-        this.setState({
-          errorMessage: "Minimum Contribution is at least 100 wei!",
-        });
       } else {
         // get users ETH account connected with their metamask wallet
         const accounts = await web3.eth.getAccounts();
@@ -56,7 +50,8 @@ class CampaignNew extends React.Component {
   };
 
   render() {
-    const { loading, errorMessage, showModal } = this.state;
+    const { loading, errorMessage, showModal, minimumContribution } =
+      this.state;
 
     return (
       <Layout>
@@ -80,9 +75,10 @@ class CampaignNew extends React.Component {
             <Input
               placeholder="Enter Minimum Contribution"
               type="number"
+              min="100" // wei
               labelPosition="right"
               label="wei"
-              value={this.state.minimumContribution}
+              value={minimumContribution}
               onChange={(e) =>
                 this.setState({ minimumContribution: e.target.value })
               }
@@ -91,7 +87,11 @@ class CampaignNew extends React.Component {
           </Form.Field>
 
           <Message error header="Error:" content={errorMessage} />
-          <Button loading={loading} primary disabled={loading}>
+          <Button
+            loading={loading}
+            primary
+            disabled={loading || minimumContribution === ""}
+          >
             Create Campaign
           </Button>
         </Form>
