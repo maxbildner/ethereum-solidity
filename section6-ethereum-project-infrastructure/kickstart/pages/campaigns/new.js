@@ -1,6 +1,6 @@
 import React from "react";
 import Layout from "../../components/Layout";
-import { Form, Button, Input, Message } from "semantic-ui-react";
+import { Form, Button, Input, Message, Modal } from "semantic-ui-react";
 import factory from "../../ethereum/factory"; // import instance of factory contract
 import web3 from "../../ethereum/web3"; // import instance of web3
 import { Router } from "../../routes";
@@ -11,6 +11,7 @@ class CampaignNew extends React.Component {
     minimumContribution: "",
     errorMessage: "",
     loading: false, // for showing loading animation on button
+    showModal: false,
   };
 
   onSubmit = async (e) => {
@@ -37,15 +38,14 @@ class CampaignNew extends React.Component {
         // get users ETH account connected with their metamask wallet
         const accounts = await web3.eth.getAccounts();
 
+        // call contract method to create a new campaign
         await factory.methods
           .createCampaign(this.state.minimumContribution)
           .send({
             from: accounts[0],
           });
 
-        // redirect user to home page
-        // - pushRoute makes url available in history (see replaceRoute if we don't want url to be in history)
-        Router.pushRoute("/");
+        this.setState({ showModal: true });
       }
     } catch (err) {
       console.log(err);
@@ -56,11 +56,22 @@ class CampaignNew extends React.Component {
   };
 
   render() {
-    const { loading, errorMessage } = this.state;
+    const { loading, errorMessage, showModal } = this.state;
 
     return (
       <Layout>
         <h3>Create a Campaign</h3>
+        <Modal
+          open={showModal}
+          actions={["OK"]}
+          onClose={() => {
+            this.setState({ showModal: false });
+            // redirect user to home page
+            // - pushRoute makes url available in history (see replaceRoute if we don't want url to be in history)
+            Router.pushRoute("/");
+          }}
+          content="Success! New campaign created. Now redirecting you to home page..."
+        />
 
         {/* only display error message if it exists (non empty string) */}
         <Form onSubmit={this.onSubmit} error={!!errorMessage}>
