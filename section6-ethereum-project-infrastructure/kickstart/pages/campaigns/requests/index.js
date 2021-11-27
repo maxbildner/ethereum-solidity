@@ -1,7 +1,7 @@
 import React from "react";
 import Layout from "../../../components/Layout";
-import { Button, Table, Message } from "semantic-ui-react";
-import { Link } from "../../../routes"; // configuration object from next-routes library
+import { Button, Table, Message, Modal } from "semantic-ui-react";
+import { Link, Router } from "../../../routes"; // configuration object from next-routes library
 import Campaign from "../../../ethereum/campaign";
 import RequestRow from "../../../components/RequestRow";
 
@@ -60,10 +60,14 @@ class RequestsIndex extends React.Component {
     return { address, requests, approversCount, requestCount };
   }
 
-  state = { errorMessage: "" };
+  state = { errorMessage: "", modalMessage: "" };
 
   setErrorMessage = (message) => {
     this.setState({ errorMessage: message });
+  };
+
+  showSuccessModal = (message) => {
+    this.setState({ modalMessage: message });
   };
 
   renderRows() {
@@ -76,6 +80,7 @@ class RequestsIndex extends React.Component {
           approversCount={this.props.approversCount}
           id={index}
           setErrorMessage={this.setErrorMessage}
+          showSuccessModal={this.showSuccessModal}
         />
       );
     });
@@ -83,6 +88,7 @@ class RequestsIndex extends React.Component {
 
   render() {
     const { Header, Row, HeaderCell, Body } = Table;
+    const { modalMessage } = this.state;
 
     return (
       <Layout>
@@ -91,6 +97,17 @@ class RequestsIndex extends React.Component {
         </Link>
 
         <h3>Request List</h3>
+        <Modal
+          open={!!modalMessage}
+          actions={["OK"]}
+          onClose={() => {
+            this.setState({ modalMessage: "" });
+            // refresh page
+            // - pushRoute makes url available in history (see replaceRoute if we don't want url to be in history)
+            Router.pushRoute(`/campaigns/${this.props.address}/requests`);
+          }}
+          content={`Success! Request ${modalMessage}! Refreshing page now...`}
+        />
 
         <Link route={`/campaigns/${this.props.address}/requests/new`}>
           <a>

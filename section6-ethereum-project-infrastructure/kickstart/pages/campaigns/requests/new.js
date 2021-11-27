@@ -1,9 +1,15 @@
 import React from "react";
 import Layout from "../../../components/Layout";
-import { Form, Button, Message, Input } from "semantic-ui-react";
+import { Form, Button, Message, Input, Modal } from "semantic-ui-react";
 import Campaign from "../../../ethereum/campaign";
 import web3 from "../../../ethereum/web3";
 import { Link, Router } from "../../../routes";
+import {
+  metaMaskIsInstalled,
+  connectedToCorrectNetwork,
+  isEmptyForm,
+  anyFormsIsEmpty,
+} from "../../../utils";
 
 class RequestNew extends React.Component {
   state = {
@@ -12,6 +18,8 @@ class RequestNew extends React.Component {
     recipient: "",
     loading: false,
     errorMessage: "",
+    firstRender: true, // becomes false after submitting form
+    showModal: false, // for display success modal after creating request
   };
 
   static async getInitialProps(props) {
@@ -21,30 +29,51 @@ class RequestNew extends React.Component {
 
   onSubmit = async (event) => {
     event.preventDefault();
+    const { description, value, recipient } = this.state;
+
+    // if any form is empty, exit
+    if (anyFormsIsEmpty([description, value, recipient])) {
+      this.setState({ firstRender: false });
+      return;
+    }
 
     this.setState({ loading: true, errorMessage: "" });
 
-    // create instance of campaign smart contract
-    const campaign = Campaign(this.props.address);
-
-    const { description, value, recipient } = this.state;
-
     try {
-      // get list of eth wallet addresses from metamask
-      const accounts = await web3.eth.getAccounts();
+      // display error if user doesn't have metamask installed
+      if (!metaMaskIsInstalled()) {
+        this.setState({ errorMessage: "You must have MetaMask installed!" });
 
-      await campaign.methods
-        .createRequest(
-          description,
-          web3.utils.toWei(value, "ether"), // contract method is expecting wei
-          recipient
-        )
-        .send({
-          from: accounts[0],
+        // if user isn't connected to Rinkby Test Netowork, display error and exit function
+      } else if (!(await connectedToCorrectNetwork())) {
+        this.setState({
+          errorMessage: "You must be connected to the Rinkby Test Network!",
         });
+      } else if (value <= 0) {
+        this.setState({
+          errorMessage: "You must enter a value greater than zero!",
+        });
+      } else {
+        // create instance of campaign smart contract
+        const campaign = Campaign(this.props.address);
 
-      // redirect user back to requests page
-      Router.pushRoute(`/campaigns/${this.props.address}/requests`);
+        const { description, value, recipient } = this.state;
+
+        // get list of eth wallet addresses from metamask
+        const accounts = await web3.eth.getAccounts();
+
+        await campaign.methods
+          .createRequest(
+            description,
+            web3.utils.toWei(value, "ether"), // contract method is expecting wei
+            recipient
+          )
+          .send({
+            from: accounts[0],
+          });
+
+        this.setState({ showModal: true });
+      }
     } catch (err) {
       console.log(err);
       this.setState({ errorMessage: err.message });
@@ -54,7 +83,15 @@ class RequestNew extends React.Component {
   };
 
   render() {
-    const { loading } = this.state;
+    const {
+      loading,
+      errorMessage,
+      value,
+      description,
+      recipient,
+      firstRender,
+      showModal,
+    } = this.state;
 
     return (
       <Layout>
@@ -63,37 +100,79 @@ class RequestNew extends React.Component {
         </Link>
 
         <h3>Create a Request</h3>
-        <Form onSubmit={this.onSubmit} error={!!this.state.errorMessage}>
+
+        <Modal
+          open={showModal}
+          actions={["OK"]}
+          onClose={() => {
+            this.setState({ showModal: false });
+            // redirect user back to requests page
+            // - pushRoute makes url available in history (see replaceRoute if we don't want url to be in history)
+            Router.pushRoute(`/campaigns/${this.props.address}/requests`);
+          }}
+          content="Success! New request created. Now redirecting you to requests page..."
+        />
+
+        <Form onSubmit={this.onSubmit} error={!!errorMessage}>
           <Form.Field>
             <label>Description</label>
             <Input
-              value={this.state.description}
+              value={description}
               onChange={(e) => this.setState({ description: e.target.value })}
               disabled={loading}
+              error={isEmptyForm(description) && !firstRender}
             />
+            <div
+              className={
+                isEmptyForm(description) && !firstRender
+                  ? "required-error"
+                  : "hidden"
+              }
+            >
+              required!
+            </div>
           </Form.Field>
 
           <Form.Field>
             <label>Value (Ether)</label>
             <Input
-              value={this.state.value}
+              value={value}
               onChange={(e) => this.setState({ value: e.target.value })}
               disabled={loading}
+              error={isEmptyForm(value) && !firstRender}
+              type="number"
             />
+            <div
+              className={
+                isEmptyForm(value) && !firstRender ? "required-error" : "hidden"
+              }
+            >
+              required!
+            </div>
           </Form.Field>
 
           <Form.Field>
             <label>Recipient</label>
             <Input
-              value={this.state.recipient}
+              value={recipient}
               onChange={(e) => this.setState({ recipient: e.target.value })}
               disabled={loading}
+              error={isEmptyForm(recipient) && !firstRender}
             />
+            <div
+              className={
+                isEmptyForm(recipient) && !firstRender
+                  ? "required-error"
+                  : "hidden"
+              }
+            >
+              required!
+            </div>
           </Form.Field>
 
-          <Message error header="Error:" content={this.state.errorMessage} />
+          <Message error header="Error:" content={errorMessage} />
 
-          <Button loading={this.state.loading} primary disabled={loading}>
+          <Button loading={loading} primary disabled={loading}>
             Create!
           </Button>
         </Form>

@@ -14,15 +14,21 @@ const connectedToCorrectNetwork = async () => {
 const metaMaskIsInstalled = () => {
   return (
     typeof window !== "undefined" && // code is run in the browser
-    typeof window.ethereum == "undefined" // user does NOT have metamask installed)
+    typeof window.ethereum !== "undefined" // user DOES have metamask installed
   );
 };
 
-// returns true if input string is not empty
-// const isValidForm = (form) => {
-//   form = form.replace(/\s/g, "") // removes empty spaces
-//   return !!form
-// }
+// returns true if input string is empty
+const isEmptyForm = (form) => {
+  form = form.replace(/\s/g, ""); // removes empty spaces
+  return !form;
+};
+
+// returns true if any form (array of strings) is empty
+// returns false if all forms are not empty
+const anyFormsIsEmpty = (forms) => {
+  return !forms.every((form) => !isEmptyForm(form));
+};
 
 // returns true if input string is a number
 // "2" => true
@@ -40,4 +46,10 @@ const isNumber = (str) => {
 // console.log(isNumber("a2")); // false
 // console.log(isNumber("asd")); // false
 
-export { connectedToCorrectNetwork, metaMaskIsInstalled, isNumber };
+export {
+  connectedToCorrectNetwork,
+  metaMaskIsInstalled,
+  isNumber,
+  isEmptyForm,
+  anyFormsIsEmpty,
+};

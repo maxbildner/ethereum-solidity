@@ -58,7 +58,7 @@ class CampaignShow extends React.Component {
         header: requestsCount,
         meta: "Number of Requests",
         description:
-          "A request by the manager tries to withdraw money from the smart contract (balance)." +
+          "A request by the manager tries to withdraw money from the smart contract (balance). " +
           "Requests must be approved by donators",
       },
       {

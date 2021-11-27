@@ -18,14 +18,11 @@ class RequestRow extends React.Component {
       // get all eth accounts that user has connected to metamask wallet
       const accounts = await web3.eth.getAccounts();
 
-      await campaign.methods.approveRequest(this.props.id).send({
-        from: accounts[0],
-      });
+      // await campaign.methods.approveRequest(this.props.id).send({
+      //   from: accounts[0],
+      // });
 
-      alert("Approved!");
-
-      // redirect user to same page to force refresh
-      // Router.replaceRoute(`/campaigns/${this.props.address}/requests`);
+      this.props.showSuccessModal("approved");
     } catch (err) {
       console.log(err);
       this.props.setErrorMessage(err.message);
@@ -45,14 +42,11 @@ class RequestRow extends React.Component {
       const accounts = await web3.eth.getAccounts();
 
       // only campaign manager can finalize request (i.e. send money to recipient)
-      await campaign.methods.finalizeRequest(this.props.id).send({
-        from: accounts[0],
-      });
+      // await campaign.methods.finalizeRequest(this.props.id).send({
+      //   from: accounts[0],
+      // });
 
-      alert("Finalized!");
-
-      // redirect user to same page to force refresh
-      // Router.replaceRoute(`/campaigns/${this.props.address}/requests`);
+      this.props.showSuccessModal("finalized");
     } catch (err) {
       console.log(err);
       this.props.setErrorMessage(err.message);

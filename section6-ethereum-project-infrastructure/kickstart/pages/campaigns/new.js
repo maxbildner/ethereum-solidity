@@ -20,7 +20,7 @@ class CampaignNew extends React.Component {
 
     try {
       // display error if user doesn't have metamask installed
-      if (metaMaskIsInstalled()) {
+      if (!metaMaskIsInstalled()) {
         this.setState({ errorMessage: "You must have MetaMask installed!" });
 
         // if user isn't connected to Rinkby Test Netowork, display error and exit function
