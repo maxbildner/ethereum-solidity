@@ -29,10 +29,10 @@ beforeEach(async () => {
   // => returns a promise that resolves to a list of accounts
 
   // Use one of those accounts to deploy the contract
-  // create a JS instance of a contract
-  // - interface tells web3 what methods the Inbox contract has
-  // - has a methods property (with methods defined in the .sol file)
-  // - has options property (with info about the contract like address, gasPrice, gas, ...)
+  // create a JS instance of a factory contract
+  // - interface tells web3 what methods the factory contract has
+  //    - has a methods property (with methods defined in the .sol file)
+  //    - has options property (with info about the contract like address, gasPrice, gas, ...)
   factory = await new web3.eth.Contract(JSON.parse(compiledFactory.interface))
 
     // tells web3 that we want to deploy a new contract
