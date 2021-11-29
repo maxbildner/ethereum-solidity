@@ -22,3 +22,42 @@
 .hidden {
   display: none;
 }
+
+/* STICKY FOOTER COMPONENT */
+html,
+body,
+#__next {
+  height: 100%;
+}
+
+div.ui.container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.content {
+  flex: 1 0 auto;
+}
+
+.footer-wrap {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+  padding-bottom: 1rem;
+}
+
+.footer {
+  width: 12rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+.git-url {
+  color: #4183c4;
+}
+
+.git-url:hover {
+  text-decoration: underline;
+}
