@@ -164,3 +164,23 @@ describe("Campaigns", () => {
     assert(balance > 103); // ether
   });
 });
+
+// TO ADD:
+// contribute
+// - user contributing multiple times only increases approversCount by 1
+// - user can contribute multiple times, but only vote once
+
+// createRequest
+// - can only be executed/sent by by the manager
+// - recipient of new request cannot be the manager
+
+// approveRequest
+// - only donators can approve a request
+// - people can only vote once!
+
+// finalizeRequest
+// - can only be executed by manager
+// - more than 50% of donators must have approved this request
+// - will run only if request has not already been finalized
+// - shows error if campaign funds not enough to send to recipient
+// - sends money to vendor (recipient)

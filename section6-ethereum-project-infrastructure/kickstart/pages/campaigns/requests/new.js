@@ -9,6 +9,7 @@ import {
   connectedToCorrectNetwork,
   isEmptyForm,
   anyFormsIsEmpty,
+  getRevertReason,
 } from "../../../utils";
 
 class RequestNew extends React.Component {
@@ -76,7 +77,14 @@ class RequestNew extends React.Component {
       }
     } catch (err) {
       console.log(err);
-      this.setState({ errorMessage: err.message });
+
+      let errorReason;
+      if (err.receipt) {
+        let transactionHash = err.receipt.transactionHash;
+        errorReason = await getRevertReason(transactionHash);
+      }
+
+      this.setState({ errorMessage: errorReason || err.message });
     }
 
     this.setState({ loading: false });

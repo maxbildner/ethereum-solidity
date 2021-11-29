@@ -9,10 +9,11 @@ import {
   isNumber,
   metaMaskIsInstalled,
   connectedToCorrectNetwork,
+  getRevertReason,
 } from "../utils";
 
 const ContributeForm = (props) => {
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState(""); // ether to contribute
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [loading, setLoading] = useState(false); // for showing loading animation on button
@@ -23,9 +24,11 @@ const ContributeForm = (props) => {
     setErrorMessage("");
     setSuccessMessage("");
 
+    let minContributionEth = web3.utils.fromWei(props.minContribution, "ether"); // convert from wei to ether
+
     try {
-      if (value < 0.001) {
-        setErrorMessage(".001 ETH Minimum Contribution!");
+      if (value < minContributionEth) {
+        setErrorMessage(`${minContributionEth} ETH Minimum Contribution!`);
 
         // display error if user doesn't have metamask installed
       } else if (!metaMaskIsInstalled()) {
@@ -53,7 +56,14 @@ const ContributeForm = (props) => {
       }
     } catch (err) {
       console.log(err);
-      setErrorMessage(err.message);
+
+      let errorReason;
+      if (err.receipt) {
+        let transactionHash = err.receipt.transactionHash;
+        errorReason = await getRevertReason(transactionHash);
+      }
+
+      setErrorMessage(errorReason || err.message);
     }
 
     setLoading(false);
@@ -63,7 +73,10 @@ const ContributeForm = (props) => {
   return (
     <Form onSubmit={onSubmit} error={!!errorMessage} success={!!successMessage}>
       <Form.Field>
-        <label>Amount to Contribute (.001 ETH Min)</label>
+        <label>
+          Amount to Contribute (
+          {web3.utils.fromWei(props.minContribution, "ether")} ETH Min)
+        </label>
         <Input
           label="ether"
           labelPosition="right"

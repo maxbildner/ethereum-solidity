@@ -73,15 +73,17 @@ contract Campaign {
 
   // create a modifier called restricted
   modifier restricted() {
-    require(msg.sender == manager);
+    require(msg.sender == manager, "You must be the manager to execute this function!");
     _;
   }
   
   
   // minimum (wei) contribution when people donate
-  // - returns address of the newly created campaign
+  // - returns address of the newly created campaign (? default return value of all constructors?!)
   function Campaign(uint minimum, address senderAddress) public {
-      
+
+    require(minimum >= 100, "Minimum campaign contribution must be 100 Wei");
+
     // msg = global variable with sender (address) of who sent the transaction
     // don't want below because msg.sender will refer to address of Factory Campaign!
     // manager = msg.sender;
@@ -96,15 +98,20 @@ contract Campaign {
   function contribute() public payable {
       
     // msg.value = amount in wei someone sent in the transaction
-    require(msg.value > minimumContribution);
-    
+    require(msg.value >= minimumContribution, "Minimum contribution not met!");
+
+    // user can contribute multiple times, but can only vote once!
+    // if user hasn't already contributed
+    if (!approvers[msg.sender]) {
+
+      // increment number of people who have donated by 1
+      approversCount++;
+    } 
+
     // add key to approvers mapping of msg.sender, with a value of true
     approvers[msg.sender] = true;
     // - ? the address msg.sender does NOT get stored in the mapping! only the value true?
-    
-    // increment number of people who have donated by 1
-    approversCount++;
-    
+     
     totalContributions += msg.value;
   }
   
@@ -114,6 +121,9 @@ contract Campaign {
     public restricted {
     // value = amount campaign manager wants to spend on this request
     // recipient = address of vendor manager wants to send money to
+
+    // prevent manager from creating request to send money to themselves
+    require(recipient != manager, "Recipient of request cannot be the manager!");
 
     // create a new variable called newRequest, of type Request
     // - must add memory keyword below!! or else we'll get warning
@@ -143,7 +153,7 @@ contract Campaign {
     // - saving reference to request so we don't have to keep calling requests[index]
     Request storage request = requests[index];
 
-    // require person calling this method is a donator to campaign
+    // require person calling this method to be a donator to campaign
     // - cheaper/faster than looping through array
     require(approvers[msg.sender], "You must be a donator to this campaign");
 
@@ -160,8 +170,8 @@ contract Campaign {
   
 
   // called by manager after request has gotten enough approvals
-  // - managerr can call this to get money sent to vendor
-  // - index = index of requests array that the manager
+  // - manager can call this to get money sent to vendor
+  // - index = index of requests array that the manager wants to finalize
   function finalizeRequest(uint index) public restricted {
       
     // create local variable to represent request object
@@ -175,9 +185,12 @@ contract Campaign {
     // more than 50% of donators must have approved this request
     require(request.approvalCount > approversCount/2, "More than 50% of donators must have approved this request!");
     
+    // to help front end error handling
+    require(this.balance >= request.value, "Campaign balance not enough to send to recipient!");
+
     // send money to vendor
     request.recipient.transfer(request.value);
-    
+
     // update the complete flag to be true after paying vendor
     request.complete = true;
   }

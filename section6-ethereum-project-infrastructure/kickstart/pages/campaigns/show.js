@@ -18,7 +18,7 @@ class CampaignShow extends React.Component {
 
     // console.log(summary); //=>
     // {
-    //   '0': '100',    // minContribution
+    //   '0': '100',    // minContribution // wei
     //   '1': '0',      // campaign balance
     //   '2': '0',      // number of requests (from manager to spend donation money)
     //   '3': '0',      // number of donators
@@ -26,7 +26,7 @@ class CampaignShow extends React.Component {
     // }
 
     return {
-      minContribution: summary[0],
+      minContribution: summary[0], // wei
       balance: summary[1],
       requestsCount: summary[2],
       approversCount: summary[3],
@@ -73,6 +73,8 @@ class CampaignShow extends React.Component {
   }
 
   render() {
+    const { address, minContribution } = this.props;
+
     return (
       <Layout>
         <h3>Campaign Show</h3>
@@ -81,14 +83,17 @@ class CampaignShow extends React.Component {
             {/* widths are proportions, so render cards will have about 62% width (10/16) */}
             <Grid.Column width={10}>{this.renderCards()}</Grid.Column>
             <Grid.Column width={6}>
-              <ContributeForm address={this.props.address} />
+              <ContributeForm
+                address={address}
+                minContribution={minContribution} // wei
+              />
             </Grid.Column>
           </Grid.Row>
 
           <Grid.Row>
             {/* need grid.col or else button margin left will be off */}
             <Grid.Column>
-              <Link route={`/campaigns/${this.props.address}/requests`}>
+              <Link route={`/campaigns/${address}/requests`}>
                 <a>
                   <Button primary>View Requests</Button>
                 </a>

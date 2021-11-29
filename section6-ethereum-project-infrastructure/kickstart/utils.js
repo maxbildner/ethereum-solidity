@@ -1,3 +1,5 @@
+import web3 from "./ethereum/web3";
+
 // HELPER FUNCTIONS
 
 // returns true if user is connected to Rinkby Test Network
@@ -46,10 +48,34 @@ const isNumber = (str) => {
 // console.log(isNumber("a2")); // false
 // console.log(isNumber("asd")); // false
 
+const getRevertReason = async (txHash) => {
+  try {
+    const tx = await web3.eth.getTransaction(txHash);
+
+    var result = await web3.eth.call(tx, tx.blockNumber);
+
+    result = result.startsWith("0x") ? result : `0x${result}`;
+
+    if (result && result.substr(138)) {
+      const reason = web3.utils.toAscii(result.substr(138));
+      console.log("Revert reason:", reason);
+      return reason;
+    } else {
+      console.log("Cannot get reason - No return value");
+    }
+  } catch (err) {
+    if (err.message) {
+      return err.message.split("\n")[0];
+    }
+    return err;
+  }
+};
+
 export {
   connectedToCorrectNetwork,
   metaMaskIsInstalled,
   isNumber,
   isEmptyForm,
   anyFormsIsEmpty,
+  getRevertReason,
 };

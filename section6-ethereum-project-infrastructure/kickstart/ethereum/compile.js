@@ -23,7 +23,7 @@ const campaignPath = path.resolve(__dirname, "contracts", "Campaign.sol");
 // get contents of file
 const source = fs.readFileSync(campaignPath, "utf8");
 
-// compile both contracts with solidity compiler
+// 3) compile both contracts with solidity compiler
 const output = solc.compile(source, 1).contracts;
 // - output contains two objects, one for each contract (factory contract , and campaign contract) in the file
 
@@ -34,7 +34,7 @@ fs.ensureDirSync(buildPath);
 
 // loop over contract object and write outputs to the build directory
 for (let contract in output) {
-  // write out to a JSON an object that has both the bytecode and interface of 1 contract
+  // 4) write out to a JSON an object that has both the bytecode and interface of 1 contract
   fs.outputJsonSync(
     path.resolve(buildPath, contract.replace(":", "") + ".json"),
     output[contract]
