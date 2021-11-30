@@ -22,10 +22,11 @@ let factory; // reference to deployed instance of factory we're going to make
 let campaignAddress;
 let campaign;
 
+// CAMPAIGN CONTRACT TESTS ******************************************************************
 // cb will run before each it block
 beforeEach(async () => {
   // Get a list of all accounts (unlocked = can freely send/receive ether)
-  accounts = await web3.eth.getAccounts();
+  accounts = await web3.eth.getAccounts(); // 10 generated "fake" accounts
   // => returns a promise that resolves to a list of accounts
 
   // Use one of those accounts to deploy the contract
@@ -58,7 +59,7 @@ beforeEach(async () => {
   // same as below:
   //  const addresses = await factory.methods.getDeployedCampaigns().call();
   //  campaignAddress = addresses[0];
-  // campaignAddress = array of addresses that we have for deployed campaigns
+  // // addresses == array of addresses that we have for deployed campaigns
 
   // already deployed version of campaign contract
   campaign = await new web3.eth.Contract(
@@ -165,7 +166,8 @@ describe("Campaigns", () => {
   });
 });
 
-// TO ADD:
+// TO DO:
+// CAMPAIGN CONTRACT
 // contribute
 // - user contributing multiple times only increases approversCount by 1
 // - user can contribute multiple times, but only vote once
