@@ -48,121 +48,123 @@ beforeEach(async () => {
   //=> proimse that resolves to transaction hash (like a receipt)
 });
 
-describe("Campaign Factory", () => {
+describe("Campaign Factory Contract", () => {
   it("deploys a factory contract", async () => {
     // presence of an address is a good way to check for presence of a contract
     // - assert.ok( ), does what you pass into the assert.ok exist
     assert.ok(factory.options.address);
   });
 
-  it("createCampaign- requires a minimum contribution of at least 100 wei", async () => {
-    try {
-      // try creating valid campaign- we should not hit catch if method code is correct
-      await factory.methods.createCampaign(100).send({
-        from: accounts[0],
-        gas: "1000000",
-      });
-    } catch (err) {
-      assert(false);
-    }
+  describe("#createCampaign()", () => {
+    it("requires a minimum contribution of at least 100 wei", async () => {
+      try {
+        // try creating valid campaign- we should not hit catch if method code is correct
+        await factory.methods.createCampaign(100).send({
+          from: accounts[0],
+          gas: "1000000",
+        });
+      } catch (err) {
+        assert(false);
+      }
 
-    try {
-      // try creating invalid campaign
+      try {
+        // try creating invalid campaign
+        await factory.methods
+          .createCampaign(90) // 100 wei = min campaign contribution
+          .send({
+            from: accounts[0], // manager of campaign
+            gas: "1000000",
+          });
+
+        // should hit this if contract method code is correct (i.e. does have correct require statement)
+      } catch (err) {
+        assert(err);
+        return;
+      }
+
+      // we hit this if our contract method code is incorrect (i.e. doesn't have correct require statement)
+      assert(false);
+    });
+
+    it("sets sender of function as the manager attribute of the campaign contract instance", async () => {
       await factory.methods
-        .createCampaign(90) // 100 wei = min campaign contribution
+        .createCampaign("100") // 100 wei = min campaign contribution
         .send({
           from: accounts[0], // manager of campaign
           gas: "1000000",
         });
 
-      // should hit this if contract method code is correct (i.e. does have correct require statement)
-    } catch (err) {
-      console.log("catch");
-      assert(err);
-      return;
-    }
+      // take first element that's returned from await array and assign it to campaignAddress
+      [campaignAddress] = await factory.methods.getDeployedCampaigns().call();
+      // same as below:
+      //  const addresses = await factory.methods.getDeployedCampaigns().call();
+      //  campaignAddress = addresses[0];
+      // // addresses == array of addresses that we have for deployed campaigns
 
-    // we hit this if our contract method code is incorrect (i.e. doesn't have correct require statement)
-    assert(false);
-  });
+      // // already deployed version of campaign contract
+      campaign = await new web3.eth.Contract(
+        JSON.parse(compiledCampaign.interface),
+        campaignAddress
+      );
 
-  it("createCampaign- sets sender of function as the manager attribute of the campaign contract instance", async () => {
-    await factory.methods
-      .createCampaign("100") // 100 wei = min campaign contribution
-      .send({
+      const manager = await campaign.methods.manager().call();
+      assert.equal(accounts[0], manager);
+    });
+
+    it("sets the minimumContribution attribute of the campaign contract instance", async () => {
+      let min = 500;
+
+      await factory.methods.createCampaign(min).send({
         from: accounts[0], // manager of campaign
         gas: "1000000",
       });
 
-    // take first element that's returned from await array and assign it to campaignAddress
-    [campaignAddress] = await factory.methods.getDeployedCampaigns().call();
-    // same as below:
-    //  const addresses = await factory.methods.getDeployedCampaigns().call();
-    //  campaignAddress = addresses[0];
-    // // addresses == array of addresses that we have for deployed campaigns
+      // take first element that's returned from await array and assign it to campaignAddress
+      [campaignAddress] = await factory.methods.getDeployedCampaigns().call();
+      // same as below:
+      //  const addresses = await factory.methods.getDeployedCampaigns().call();
+      //  campaignAddress = addresses[0];
+      // // addresses == array of addresses that we have for deployed campaigns
 
-    // // already deployed version of campaign contract
-    campaign = await new web3.eth.Contract(
-      JSON.parse(compiledCampaign.interface),
-      campaignAddress
-    );
+      // // already deployed version of campaign contract
+      campaign = await new web3.eth.Contract(
+        JSON.parse(compiledCampaign.interface),
+        campaignAddress
+      );
 
-    const manager = await campaign.methods.manager().call();
-    assert.equal(accounts[0], manager);
-  });
-
-  it("createCampaign- sets the minimumContribution attribute of the campaign contract instance", async () => {
-    let min = 500;
-
-    await factory.methods.createCampaign(min).send({
-      from: accounts[0], // manager of campaign
-      gas: "1000000",
+      const minimumContribution = await campaign.methods
+        .minimumContribution()
+        .call();
+      assert.equal(minimumContribution, min);
     });
-
-    // take first element that's returned from await array and assign it to campaignAddress
-    [campaignAddress] = await factory.methods.getDeployedCampaigns().call();
-    // same as below:
-    //  const addresses = await factory.methods.getDeployedCampaigns().call();
-    //  campaignAddress = addresses[0];
-    // // addresses == array of addresses that we have for deployed campaigns
-
-    // // already deployed version of campaign contract
-    campaign = await new web3.eth.Contract(
-      JSON.parse(compiledCampaign.interface),
-      campaignAddress
-    );
-
-    const minimumContribution = await campaign.methods
-      .minimumContribution()
-      .call();
-    assert.equal(minimumContribution, min);
   });
 
-  it("getDeployedCampaigns- returns array of deployed campaigns (addresses)", async () => {
-    // create 1st campaign instance
-    await factory.methods
-      .createCampaign("100") // 100 wei = min campaign contribution
-      .send({
-        from: accounts[0], // manager of campaign
+  describe("#getDeployedCampaigns()", () => {
+    it("returns array of deployed campaigns (addresses)", async () => {
+      // create 1st campaign instance
+      await factory.methods
+        .createCampaign("100") // 100 wei = min campaign contribution
+        .send({
+          from: accounts[0], // manager of campaign
+          gas: "1000000",
+        });
+
+      // get array of addresses that we have for deployed campaigns
+      let addresses = await factory.methods.getDeployedCampaigns().call();
+
+      assert.equal(addresses.length, 1);
+
+      // create 2nd campaign instance
+      await factory.methods.createCampaign("200").send({
+        from: accounts[0],
         gas: "1000000",
       });
 
-    // get array of addresses that we have for deployed campaigns
-    let addresses = await factory.methods.getDeployedCampaigns().call();
+      // update addresses array
+      addresses = await factory.methods.getDeployedCampaigns().call();
 
-    assert.equal(addresses.length, 1);
-
-    // create 2nd campaign instance
-    await factory.methods.createCampaign("200").send({
-      from: accounts[0],
-      gas: "1000000",
+      assert.equal(addresses.length, 2);
     });
-
-    // update addresses array
-    addresses = await factory.methods.getDeployedCampaigns().call();
-
-    assert.equal(addresses.length, 2);
-    // already deployed version of campaign contract
   });
 });
 
@@ -171,12 +173,13 @@ describe("Campaign Factory", () => {
 // constructor
 // - deploys campaign factory contract DONE
 
-// createCampaign
+// #createCampaign()
 // - min campaign contribution must be at least 100 wei DONE
 // - sets sender of function as the manager of the campaign contract instance DONE
 // - sets the minimumContribution attribute of the cmapaign contract instance DONE
 
-// getDeployedCampaigns
+// #getDeployedCampaigns()
 // - returns array of deployed campaigns (addresses) DONE
 
-// what happens when we try calling attribute deployedCampaigns (without passing in idx)?
+// what happens when we try calling attribute deployedCampaigns (array) (without passing in idx)?
+//  - will get error on front end

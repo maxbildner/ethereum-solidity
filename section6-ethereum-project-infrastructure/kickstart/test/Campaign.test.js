@@ -68,11 +68,10 @@ beforeEach(async () => {
   );
 });
 
-describe("Campaigns", () => {
-  it("deploys a factory and a campaign", () => {
+describe("Campaign Contract", () => {
+  it("deploys a Campaign Contract", () => {
     // presence of an address is a good way to check for presence of a contract
     // - assert.ok( ), does what you pass into the assert.ok exist
-    assert.ok(factory.options.address);
     assert.ok(campaign.options.address);
   });
 
