@@ -23,7 +23,9 @@ let campaignAddress;
 let campaign;
 
 // CAMPAIGN FACTORY CONTRACT TESTS ************************************************************
-// cb will run before each it block
+// - beforeEach callback will run before each it block within the beforeEach's scope,
+//   but not outside of the beforeEach's scope
+// - QUESTION- ? why do we need to deploy before every it block? why can't we just deploy once and then run tests?
 beforeEach(async () => {
   // Get a list of all accounts (unlocked = can freely send/receive ether)
   accounts = await web3.eth.getAccounts(); // 10 generated "fake" accounts

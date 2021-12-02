@@ -23,7 +23,8 @@ let campaignAddress;
 let campaign;
 
 // CAMPAIGN CONTRACT TESTS ******************************************************************
-// cb will run before each it block
+// - beforeEach callback will run before each it block within the beforeEach's scope,
+//   but not outside of the beforeEach's scope
 beforeEach(async () => {
   // Get a list of all accounts (unlocked = can freely send/receive ether)
   accounts = await web3.eth.getAccounts(); // 10 generated "fake" accounts
@@ -81,52 +82,110 @@ describe("Campaign Contract", () => {
     assert.equal(accounts[0], manager);
   });
 
-  it("allows people to contribute money and marks them as approvers", async () => {
-    await campaign.methods.contribute().send({
-      value: "200", // wei
-      from: accounts[1],
+  describe("#contribute()", () => {
+    // campaign has min contribution tied to it
+    it("should not allow people to contribute less than the minimum contribution", async () => {
+      try {
+        // call campaigns contribute function and send in 5 wei (below minimum), we should error out if our code is correct
+        await campaign.methods.contribute().send({
+          value: "5", // (wei)- this is below the 100 minimum contribution!
+          from: accounts[1],
+        });
+      } catch (err) {
+        assert(err);
+        return;
+      }
+
+      assert(false);
     });
 
-    // approvers is a mapping (similar to JS obejct), but we can NOT retrieve entire mapping, only 1 key/value
-    const isContributor = await campaign.methods.approvers(accounts[1]).call();
-
-    // assert will fail if we argument evaluates to falsey value
-    assert(isContributor);
-  });
-
-  // campaign has min contribution tied to it
-  it("requires a minimum contribution", async () => {
-    // call campaigns contribute function and send in 100 wei
-    try {
+    it("allows people to contribute money and marks them as approvers", async () => {
       await campaign.methods.contribute().send({
-        value: "5",
+        value: "200", // wei (contribution amount)
         from: accounts[1],
       });
-    } catch (err) {
-      assert(err);
-      return;
-    }
 
-    assert(false);
-  });
+      // approvers is a mapping (similar to JS obejct), but we can NOT retrieve entire mapping, only 1 key/value
+      const isContributor = await campaign.methods
+        .approvers(accounts[1])
+        .call();
 
-  it("allows a manager to make a payment request", async () => {
-    await campaign.methods
-      .createRequest(
-        "Buy batteries",
-        "100", // costs 100 wei to buy batteries
-        accounts[2] // address of vendor we want to send wei to
-      )
-      .send({
-        from: accounts[0], // manager address
-        gas: "1000000", // arbitrarily put 1m
+      // assert will fail if argument evaluates to falsey value
+      assert(isContributor);
+    });
+
+    it("increases the totalContributions attribute by the value sent in the tx object", async () => {
+      let totalContributionsBefore = await campaign.methods
+        .totalContributions()
+        .call();
+      // console.log(totalContributionsBefore);  //=> 0
+
+      let contributionAmount = 200;
+      await campaign.methods.contribute().send({
+        value: contributionAmount, // wei
+        from: accounts[1],
       });
 
-    // grab first request object in requests array
-    const request = await campaign.methods.requests(0).call();
+      let totalContributionsAfter = await campaign.methods
+        .totalContributions()
+        .call();
+      // console.log(totalContributionsAfter); //=> 200
 
-    assert.equal("Buy batteries", request.description);
+      assert.equal(
+        totalContributionsAfter - totalContributionsBefore,
+        contributionAmount
+      );
+    });
+
+    it("increases approversCount only by 1 no matter how many times the user contributes", async () => {
+      let approversCountBefore = await campaign.methods.approversCount().call(); // approversCount() == num of unique donators
+      // console.log(approversCountBefore);  //=> 0
+
+      // person from account[1] donates 200 wei
+      await campaign.methods.contribute().send({
+        value: "200", // wei (contribution amount)
+        from: accounts[1],
+      });
+
+      let approversCountAfter = await campaign.methods.approversCount().call();
+      // console.log(approversCountAfter); //=> "1"
+
+      // person from account[1] donates another 200 wei
+      await campaign.methods.contribute().send({
+        value: "200",
+        from: accounts[1],
+      });
+
+      approversCountAfter = await campaign.methods.approversCount().call();
+      // console.log(approversCountAfter); //=> "1"
+
+      assert(Number(approversCountAfter) === 1);
+    });
   });
+
+  describe("#createRequest()", () => {
+    it("allows a manager to make a payment request", async () => {
+      await campaign.methods
+        .createRequest(
+          "Buy batteries",
+          "100", // costs 100 wei to buy batteries
+          accounts[2] // address of vendor we want to send wei to
+        )
+        .send({
+          from: accounts[0], // manager address
+          gas: "1000000", // arbitrarily put 1m
+        });
+
+      // grab first request object in requests array
+      const request = await campaign.methods.requests(0).call();
+
+      assert.equal("Buy batteries", request.description);
+    });
+  });
+
+  describe("#approveRequest()", () => {});
+
+  describe("#finalizeRequest()", () => {});
 
   it("processes requests", async () => {
     await campaign.methods.contribute().send({
@@ -166,22 +225,28 @@ describe("Campaign Contract", () => {
 });
 
 // TO DO:
-// CAMPAIGN CONTRACT
-// contribute
-// - user contributing multiple times only increases approversCount by 1
-// - user can contribute multiple times, but only vote once
+// CAMPAIGN CONTRACT METHODS:
+// #contribute()
+// - should not allow people to contribute less than the minimum contribution       DONE
+// - allows people to contribute money and marks them as .approvers                 DONE
+// - increases the totalContributions attribute by the value sent in the tx object  DONE
+// - user contributing multiple times only increases approversCount by 1            DONE
 
-// createRequest
+// #createRequest()
 // - can only be executed/sent by by the manager
 // - recipient of new request cannot be the manager
 
-// approveRequest
+// #approveRequest()
 // - only donators can approve a request
-// - people can only vote once!
+// - people can only vote once! (can contribute multiple times)
 
-// finalizeRequest
+// #finalizeRequest()
 // - can only be executed by manager
 // - more than 50% of donators must have approved this request
 // - will run only if request has not already been finalized
 // - shows error if campaign funds not enough to send to recipient
 // - sends money to vendor (recipient)
+
+// #getSummary()
+
+// #getRequestsCount()
