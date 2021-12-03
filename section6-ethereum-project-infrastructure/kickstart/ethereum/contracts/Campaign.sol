@@ -44,10 +44,12 @@ contract Campaign {
     uint approvalCount;                 // number of people who have approved request
 
     // NOTE* we do NOT have access to this method approvals below because we can't retrieve an entire mapping!
+    // - we can only access this method from within this contract!!
     mapping(address => bool) approvals; // people (address) who have approved request
   }
   
   // create an array of request objects
+  // - we cannot call this method without passing in a specific index!
   Request[] public requests;
   
   // address of person who created the kickstarter campaign
@@ -65,7 +67,7 @@ contract Campaign {
   // - we can NOT iterate through values of mapping, or retrieve entire mapping
   mapping (address => bool) public approvers;
 
-  // number of donators- people in approvers object (mapping)
+  // total number of donators- people in approvers object (mapping)
   uint public approversCount;
 
   // how much money (Wei) people have donated to this campaign

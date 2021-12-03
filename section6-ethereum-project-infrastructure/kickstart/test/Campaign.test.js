@@ -164,15 +164,41 @@ describe("Campaign Contract", () => {
   });
 
   describe("#createRequest()", () => {
+    it("throws error if function is sent by non manager", async () => {
+      let recipient = accounts[1]; // address of vendor we want to send wei to
+      let randomPerson = accounts[2]; // NOT the manager!
+
+      try {
+        // try creating request NOT as a manager (we should hit catch statement)
+        await campaign.methods
+          .createRequest("buy batteries", 100, recipient)
+          .send({
+            from: randomPerson, // NOT the manager
+            gas: "1000000", // 1m
+          });
+      } catch (err) {
+        assert(err);
+        return;
+      }
+
+      // if we're here, that means out code is wrong!
+      assert(false);
+    });
+
+    // does not throw error if function is sent by non manager
     it("allows a manager to make a payment request", async () => {
+      let manager = await campaign.methods.manager().call(); // accounts[0]
+      let recipient = accounts[1]; // address of vendor we want to send wei to
+      let randomPerson = accounts[2]; // NOT the manager!
+
       await campaign.methods
         .createRequest(
           "Buy batteries",
           "100", // costs 100 wei to buy batteries
-          accounts[2] // address of vendor we want to send wei to
+          recipient
         )
         .send({
-          from: accounts[0], // manager address
+          from: manager,
           gas: "1000000", // arbitrarily put 1m
         });
 
@@ -181,11 +207,171 @@ describe("Campaign Contract", () => {
 
       assert.equal("Buy batteries", request.description);
     });
+
+    // this would be like sending the manager sending money to themselves
+    it("recipient of request cannot be the manager", async () => {
+      let manager = await campaign.methods.manager().call(); // accounts[0]
+
+      try {
+        // try sending request as the manager (we should error out if our code is correct)
+        await campaign.methods.createRequest("Pay myself", 100, manager).send({
+          from: manager,
+          gas: "1000000",
+        });
+      } catch (err) {
+        assert(err);
+        return;
+      }
+
+      // if we're here that means our code is wrong
+      assert(false);
+    });
   });
 
-  describe("#approveRequest()", () => {});
+  describe("#approveRequest()", () => {
+    // only donors can approve requests
+    it("should throw error if non donator (approver) tries to approve request", async () => {
+      let manager = accounts[0];
+      let donator1 = accounts[1];
+      let recipient = accounts[2];
 
-  describe("#finalizeRequest()", () => {});
+      // donator1 contributes 200 wei to campaign
+      await campaign.methods.contribute().send({
+        from: donator1,
+        value: 200,
+      });
+
+      // manager creates payment request to recipient
+      await campaign.methods
+        .createRequest("buy batteries", 100, recipient)
+        .send({
+          from: manager,
+          gas: "1000000",
+        });
+
+      // try approving the first request as a non donator (ex. recipient)
+      try {
+        await campaign.methods.approveRequest(0).send({
+          from: recipient, // NON DONATOR!!!
+          gas: "1000000",
+        });
+
+        // we should error out if our code is correct
+      } catch (err) {
+        assert(err);
+        return;
+      }
+
+      // if we're here, our smart contract code is incorrect!
+      assert(false);
+    });
+
+    // should not throw error if a donator approves a request the first time
+    it("make sure donators don't vote twice on a request", async () => {
+      let manager = accounts[0];
+      let donator1 = accounts[1];
+      let recipient = accounts[2];
+
+      // donator1 contributes 200 wei to campaign
+      await campaign.methods.contribute().send({
+        from: donator1,
+        value: 200,
+      });
+
+      // manager creates payment request to recipient
+      await campaign.methods
+        .createRequest("buy batteries", 100, recipient)
+        .send({
+          from: manager,
+          gas: "1000000",
+        });
+
+      // donator 1 approves request
+      await campaign.methods.approveRequest(0).send({
+        from: donator1, // valid donator
+        gas: "1000000",
+      });
+
+      // get request at index 0 (there should only be 1 request)
+      let request = await campaign.methods.requests(0).call();
+      // console.log(request.approvals); // => undefined, we cannot access a mapping!!!
+
+      // donator1 tries making another illegal approval for this request
+      try {
+        await campaign.methods.approveRequest(0).send({
+          from: donator1,
+          gas: "1000000",
+        });
+
+        // we should error out if our code is correct
+      } catch (err) {
+        assert(err && String(request.approvalCount) === "1");
+        return;
+      }
+
+      // if we're here, our smart contract code is incorrect!
+      assert(false);
+    });
+  });
+
+  describe("#finalizeRequest()", () => {
+    let manager;
+    let donator1;
+    let recipient;
+
+    beforeEach(async () => {
+      manager = accounts[0];
+      donator1 = accounts[1];
+      recipient = accounts[2];
+
+      // donator1 makes 100 wei donation
+      await campaign.methods.contribute().send({
+        value: 100,
+        from: donator1,
+      });
+
+      // manager creates spending request to recipient
+      await campaign.methods
+        .createRequest("data subscription", 100, recipient)
+        .send({
+          from: manager,
+          gas: "1000000",
+        });
+
+      // first request in requests array
+      let request = await campaign.methods.requests(0).call();
+
+      // donator1 approves request
+      await campaign.methods.approveRequest(0).send({
+        from: donator1,
+        gas: "1000000",
+      });
+    });
+
+    it("can only be executed by manager", async () => {
+      // try finalizing request as non manager
+      try {
+        await campaign.methods.finalizeRequest(0).send({
+          from: donator1, // not the manager!
+        });
+
+        // we should error out if our code is correct
+      } catch (err) {
+        assert(err);
+        return;
+      }
+
+      assert(false);
+    });
+
+    // it("more than 50% of donators must have approved this request", async () => {});
+
+    // it("will run only if request has not already been finalized", async () => {});
+
+    // it("shows error if campaign funds not enough to send to recipient", async () => {});
+
+    // it("sends money to vendor (recipient)", async () => {});
+  });
 
   it("processes requests", async () => {
     await campaign.methods.contribute().send({
@@ -233,20 +419,22 @@ describe("Campaign Contract", () => {
 // - user contributing multiple times only increases approversCount by 1            DONE
 
 // #createRequest()
-// - can only be executed/sent by by the manager
-// - recipient of new request cannot be the manager
+// - can only be executed/sent by by the manager                                    DONE
+// - recipient of new request cannot be the manager                                 DONE
 
 // #approveRequest()
-// - only donators can approve a request
-// - people can only vote once! (can contribute multiple times)
+// - only donators can approve a request                                            DONE
+// - people can only vote once! (can contribute multiple times)                     DONE
 
 // #finalizeRequest()
-// - can only be executed by manager
+// - can only be executed by manager                                                DONE
 // - more than 50% of donators must have approved this request
 // - will run only if request has not already been finalized
 // - shows error if campaign funds not enough to send to recipient
 // - sends money to vendor (recipient)
 
 // #getSummary()
+// - returns object (keys0,1,2,3,4 and values info about current campaign instance)
 
 // #getRequestsCount()
+// - returns length of requests array
