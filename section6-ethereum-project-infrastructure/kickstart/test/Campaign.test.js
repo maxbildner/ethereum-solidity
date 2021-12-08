@@ -338,9 +338,6 @@ describe("Campaign Contract", () => {
           gas: "1000000",
         });
 
-      // first request in requests array
-      let request = await campaign.methods.requests(0).call();
-
       // donator1 approves request
       await campaign.methods.approveRequest(0).send({
         from: donator1,
@@ -353,6 +350,7 @@ describe("Campaign Contract", () => {
       try {
         await campaign.methods.finalizeRequest(0).send({
           from: donator1, // not the manager!
+          gas: "1000000",
         });
 
         // we should error out if our code is correct
@@ -364,50 +362,208 @@ describe("Campaign Contract", () => {
       assert(false);
     });
 
-    // it("more than 50% of donators must have approved this request", async () => {});
+    it("throws error if less than 50% of donators approved a request", async () => {
+      // 2nd donator to campaign
+      let donator2 = accounts[3];
 
-    // it("will run only if request has not already been finalized", async () => {});
+      // donator2 makes 100 wei donation
+      await campaign.methods.contribute().send({
+        value: 100,
+        from: donator2,
+      });
 
-    // it("shows error if campaign funds not enough to send to recipient", async () => {});
+      // note* manager as already created a request and donator1 has approved it
+      //  (see beforeEach above)
 
-    // it("sends money to vendor (recipient)", async () => {});
-  });
+      // now manager will try finalizing this request even though only 1/2 donators
+      //  have approved this request
+      try {
+        await campaign.methods.finalizeRequest(0).send({
+          from: manager,
+          gas: "1000000",
+        });
 
-  it("processes requests", async () => {
-    await campaign.methods.contribute().send({
-      from: accounts[0],
-      value: web3.utils.toWei("10", "ether"), // use 10 ether because easier to compare large transactions than small ones
+        // we should error out if our code is correct
+      } catch (err) {
+        assert(err);
+        return;
+      }
+
+      assert(false);
     });
 
-    await campaign.methods
-      .createRequest(
-        "Buy computer",
-        web3.utils.toWei("5", "ether"),
-        accounts[1]
-      )
-      .send({
-        from: accounts[0],
+    it("successfully finalizes if more than 50% of donators approved a request", async () => {
+      // 2nd donator to campaign
+      let donator2 = accounts[3];
+
+      // donator2 makes 100 wei donation
+      await campaign.methods.contribute().send({
+        value: 100,
+        from: donator2,
+      });
+
+      // note* manager as already created a request and donator1 has approved it
+      //  (see beforeEach above)
+
+      // donator2 will now approve request
+      await campaign.methods.approveRequest(0).send({
+        from: donator2,
         gas: "1000000",
       });
 
-    await campaign.methods.approveRequest(0).send({
-      from: accounts[0],
-      gas: "1000000",
+      // manager finalizes this request (should work bec. 2/2 donators approved this)
+      try {
+        await campaign.methods.finalizeRequest(0).send({
+          from: manager,
+          gas: "1000000",
+        });
+
+        // first request in requests array
+        let request = await campaign.methods.requests(0).call();
+
+        assert(
+          request.complete && request.approvalCount > request.approvalCount / 2
+        );
+      } catch (err) {
+        assert(false);
+      }
     });
 
-    await campaign.methods.finalizeRequest(0).send({
-      from: accounts[0], // accounts[0] bec. only manager can finalize a request
-      gas: "1000000",
+    it("will run only if request has not already been finalized", async () => {
+      // manager finalizes request (only 1 donator/1 approver that already approved request)
+      await campaign.methods.finalizeRequest(0).send({
+        from: manager,
+        gas: "1000000",
+      });
+
+      // request should be complete
+      //  we should error out if we try to finalize it again
+      try {
+        await campaign.methods.finalizeRequest(0).send({
+          from: manager,
+          gas: "1000000",
+        });
+
+        // we should error out if our contract code is correct
+      } catch (err) {
+        assert(err);
+        return;
+      }
+
+      assert(false);
     });
 
-    // retrieve balance of accounts[1] and make sure it has 5 ether
-    let balance = await web3.eth.getBalance(accounts[1]); // string, wei
-    balance = web3.utils.fromWei(balance, "ether"); // convert wei to ether
-    balance = parseFloat(balance); // turn string into number
-    // console.log(balance); //=> 104.9997 because we used this account earlier in a test
+    it("shows error if campaign funds not enough to send to recipient", async () => {
+      // there should a campaign balance of 100 wei from donator 1
 
-    assert(balance > 103); // ether
+      // create another request with amount greater than campaign balance
+      await campaign.methods
+        .createRequest("data subscription", 110, recipient)
+        .send({
+          from: manager,
+          gas: "1000000",
+        });
+
+      // donator1 approves request
+      await campaign.methods.approveRequest(1).send({
+        from: donator1,
+        gas: "1000000",
+      });
+
+      // manager tries to finalize 2nd request
+      try {
+        await campaign.methods.finalizeRequest(1).send({
+          from: manager,
+          gas: "1000000",
+        });
+
+        // we should error out if our code is correct
+      } catch (err) {
+        let bal = await web3.eth.getBalance(campaignAddress); // string, wei
+        assert(err && String(bal) === "100");
+        return;
+      }
+
+      assert(false);
+    });
+
+    it("sends money to vendor (recipient)", async () => {
+      // there should a campaign balance of 100 wei from donator 1, but this is too small
+      //    so let's create another donation/request
+
+      // donator1 makes 5 ether donation
+      await campaign.methods.contribute().send({
+        value: web3.utils.toWei("5", "ether"), // use 5 ether because easier to compare large transactions than small ones,
+        from: donator1,
+      });
+
+      // manager creates spending request to recipient for 5 ether
+      await campaign.methods
+        .createRequest(
+          "data subscription",
+          web3.utils.toWei("5", "ether"),
+          recipient
+        )
+        .send({
+          from: manager,
+          gas: "1000000",
+        });
+
+      // donator1 approves 2nd request (there should be 2 requests now)
+      await campaign.methods.approveRequest(1).send({
+        from: donator1,
+        gas: "1000000",
+      });
+
+      let beginCampaignBal = await web3.eth.getBalance(campaignAddress); // string, wei
+      // console.log("BEGIN BAL", beginCampaignBal);
+
+      let recipientBeginBal = Number(await web3.eth.getBalance(recipient)); // wei
+      // console.log("RECIPIENT BEGIN BAL", recipientBeginBal);
+
+      // let managerBeginBal = Number(await web3.eth.getBalance(manager)); // wei
+      // console.log("MANAGER BEGIN BAL", managerBeginBal);
+
+      let endCampaignBal;
+      let recipientEndBal;
+      let managerEndBal;
+
+      // manager finalizes request
+      try {
+        await campaign.methods.finalizeRequest(1).send({
+          from: manager,
+          gas: "1000000",
+        });
+
+        endCampaignBal = await web3.eth.getBalance(campaignAddress); // string, wei
+        // console.log("END BAL", endCampaignBal);
+
+        recipientEndBal = Number(await web3.eth.getBalance(recipient));
+        // console.log("RECIPIENT END BAL", recipientEndBal);
+
+        managerEndBal = Number(await web3.eth.getBalance(manager));
+        // console.log("MANAGER END BAL", managerEndBal);
+
+        assert(endCampaignBal === "100" && recipientEndBal > recipientBeginBal);
+        return;
+
+        // our code is incorrect if we error out
+      } catch (err) {
+        endCampaignBal = await web3.eth.getBalance(campaignAddress); // string, wei
+        recipientEndBal = Number(await web3.eth.getBalance(recipient));
+
+        assert(
+          endCampaignBal == beginCampaignBal &&
+            recipientEndBal == recipientBeginBal
+        );
+
+        assert(false);
+      }
+    });
   });
+
+  //   balance = web3.utils.fromWei(balance, "ether"); // convert wei to ether
+  //   balance = parseFloat(balance); // turn string into number
 });
 
 // TO DO:
@@ -428,13 +584,16 @@ describe("Campaign Contract", () => {
 
 // #finalizeRequest()
 // - can only be executed by manager                                                DONE
-// - more than 50% of donators must have approved this request
-// - will run only if request has not already been finalized
-// - shows error if campaign funds not enough to send to recipient
-// - sends money to vendor (recipient)
+// - throws error if less than 50% of donators have approved a request              DONE
+// - successfully finalizes if more than 50% of donators approved a request         DONE
+// - will run only if request has not already been finalized                        DONE
+// - shows error if campaign funds not enough to send to recipient                  DONE
+// - sends money to vendor (recipient)                                              DONE
 
 // #getSummary()
 // - returns object (keys0,1,2,3,4 and values info about current campaign instance)
 
 // #getRequestsCount()
 // - returns length of requests array
+
+// - ? why don't we need to specify gas if gas price isn't specified for contribute method?

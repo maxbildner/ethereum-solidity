@@ -187,7 +187,7 @@ contract Campaign {
     // more than 50% of donators must have approved this request
     require(request.approvalCount > approversCount/2, "More than 50% of donators must have approved this request!");
     
-    // to help front end error handling
+    // to help front end error handling (not needed, since we will revert if balance not sufficient anyuway)
     require(this.balance >= request.value, "Campaign balance not enough to send to recipient!");
 
     // send money to vendor
