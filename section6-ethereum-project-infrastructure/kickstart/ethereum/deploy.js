@@ -74,7 +74,8 @@ const deploy = async () => {
   // old contract v3 address 0xd2B8218151CdE1494c03D6c1637AD36383056f5f
   // old contract v4 address 0x8942243c042faD4398344aadfA46741758e4310A
   // old contract v5 address 0x16684e90a3ad71d6a320A2FAb32997ec747B06d9
-  // new contract v6 address 0x78eA3f995f02B91c4D3b432400B928710771a078
+  // old contract v6 address 0x78eA3f995f02B91c4D3b432400B928710771a078
+  // new contract v7 address 0x0d77aF2722083cdbd55efb5cbFBC13ed8e973114
 };
 
 deploy();

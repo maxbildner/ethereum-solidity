@@ -38,7 +38,7 @@ contract Campaign {
   // - use . operator to access variable
   struct Request {
     string description;
-    uint value;                         // amount manager wants to send vendor (eth?)
+    uint value;                         // (wei) amount manager wants to send vendor 
     address recipient;                  // vendor who is receiving money
     bool complete;                      // has request been completed (sent?)
     uint approvalCount;                 // number of people who have approved request
@@ -121,7 +121,7 @@ contract Campaign {
   // called by manager to create new spending request
   function createRequest(string description, uint value, address recipient) 
     public restricted {
-    // value = amount campaign manager wants to spend on this request
+    // value (wei) = amount campaign manager wants to spend on this request
     // recipient = address of vendor manager wants to send money to
 
     // prevent manager from creating request to send money to themselves
@@ -204,8 +204,8 @@ contract Campaign {
     uint, uint, uint, uint, address
   ) {
     return(
-      minimumContribution,
-      this.balance,    // campaign balance (balance is a built in attribute on contract)
+      minimumContribution, // wei
+      this.balance,        // campaign balance (wei). balance is a built in attribute on contract
       requests.length,
       approversCount,
       manager

@@ -501,7 +501,7 @@ describe("Campaign Contract", () => {
       await campaign.methods
         .createRequest(
           "data subscription",
-          web3.utils.toWei("5", "ether"),
+          web3.utils.toWei("5", "ether"), // converting 5 ether to wei
           recipient
         )
         .send({
@@ -562,6 +562,58 @@ describe("Campaign Contract", () => {
     });
   });
 
+  describe("#getSummary()", () => {
+    it("returns object (keys 0,1,2,3,4 and values info about current campaign instance)", async () => {
+      let manager = accounts[0];
+      let donator1 = accounts[1];
+      let recipient1 = accounts[2];
+
+      // donator1 makes a 1ETH donation
+      await campaign.methods.contribute().send({
+        value: web3.utils.toWei("1", "ether"),
+        from: donator1,
+      });
+
+      // manager creates a spending request for .5 ETH to recipient1
+      await campaign.methods
+        .createRequest(
+          "buy computer",
+          // web3.utils.toWei(0.5, "ether"), // NOPE! MUST PASS NUMBERS AS STRINGS!!!
+          web3.utils.toWei("0.5", "ether"),
+          recipient1
+        )
+        .send({
+          from: manager,
+          gas: "1000000",
+        });
+
+      // call getSummary()
+      let summary = await campaign.methods.getSummary().call();
+
+      // console.log(summary);
+      // => {
+      //   '0': '100',    // minimumContribution
+      //   '1': '1000000000000000000', // campaign balance (wei)
+      //   '2': '1', // requests.length
+      //   '3': '1', // approversCount
+      //   '4': '0xF5fCcAC99fD73837DB84B1475Eb89e0aED6d46ED' // manager
+      // }
+
+      assert(
+        summary[0] === "100" &&
+          summary[1] === "1000000000000000000" &&
+          summary[2] === "1" &&
+          summary[3] === "1" &&
+          summary[4] === manager
+      );
+
+      // call getRequestsCount()
+      let requestsCount = await campaign.methods.getRequestsCount().call();
+
+      assert(requestsCount === "1");
+    });
+  });
+
   //   balance = web3.utils.fromWei(balance, "ether"); // convert wei to ether
   //   balance = parseFloat(balance); // turn string into number
 });
@@ -591,9 +643,9 @@ describe("Campaign Contract", () => {
 // - sends money to vendor (recipient)                                              DONE
 
 // #getSummary()
-// - returns object (keys0,1,2,3,4 and values info about current campaign instance)
+// - returns object (keys0,1,2,3,4 and values info about current campaign instance) DONE
 
 // #getRequestsCount()
-// - returns length of requests array
+// - returns length of requests array                                               DONE
 
 // - ? why don't we need to specify gas if gas price isn't specified for contribute method?

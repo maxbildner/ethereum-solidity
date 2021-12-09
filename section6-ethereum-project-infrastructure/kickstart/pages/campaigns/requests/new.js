@@ -129,6 +129,7 @@ class RequestNew extends React.Component {
               onChange={(e) => this.setState({ description: e.target.value })}
               disabled={loading}
               error={isEmptyForm(description) && !firstRender}
+              placeholder="Enter request description"
             />
             <div
               className={
@@ -149,6 +150,7 @@ class RequestNew extends React.Component {
               disabled={loading}
               error={isEmptyForm(value) && !firstRender}
               type="number"
+              placeholder="Enter amount to send to recipient"
             />
             <div
               className={
@@ -166,6 +168,7 @@ class RequestNew extends React.Component {
               onChange={(e) => this.setState({ recipient: e.target.value })}
               disabled={loading}
               error={isEmptyForm(recipient) && !firstRender}
+              placeholder="Enter recipient ethereum wallet address"
             />
             <div
               className={
